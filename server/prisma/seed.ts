@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+function bootstrapPassword(key: string) { const value = process.env[key]; if (!value || value.length < 16) throw new Error('Missing strong bootstrap password: ' + key); return value; }
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
@@ -7,7 +11,6 @@ const PRODUCTION_MANAGER_ROLE = 'PRODUCTION_MANAGER' as any;
 const CASHIER_ROLE = 'CASHIER' as any;
 
 async function main() {
-  console.log('Seeding Darbar Sweets database...');
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@darbarsweets.com' },
@@ -15,7 +18,7 @@ async function main() {
     create: {
       name: 'Admin',
       email: 'admin@darbarsweets.com',
-      password: await bcrypt.hash('Admin@123', 12),
+      password: await bcrypt.hash(bootstrapPassword('SEED_ADMIN_PASSWORD'), 12),
       role: ADMIN_ROLE
     }
   });
@@ -26,7 +29,7 @@ async function main() {
     create: {
       name: 'Ahmed Cashier',
       email: 'cashier@darbarsweets.com',
-      password: await bcrypt.hash('Cashier@123', 12),
+      password: await bcrypt.hash(bootstrapPassword('SEED_CASHIER_PASSWORD'), 12),
       role: CASHIER_ROLE
     }
   });
@@ -37,7 +40,7 @@ async function main() {
     create: {
       name: 'Production Manager',
       email: 'production@darbarsweets.com',
-      password: await bcrypt.hash('Production@123', 12),
+      password: await bcrypt.hash(bootstrapPassword('SEED_PRODUCTION_PASSWORD'), 12),
       role: PRODUCTION_MANAGER_ROLE
     }
   });
@@ -349,10 +352,6 @@ async function main() {
     });
   }
 
-  console.log('Seed complete!');
-  console.log('Admin: admin@darbarsweets.com | Password: Admin@123');
-  console.log('Production: production@darbarsweets.com | Password: Prod@123');
-  console.log('Cashier: cashier@darbarsweets.com | Password: Cashier@123');
 }
 
 main()

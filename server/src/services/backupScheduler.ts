@@ -16,11 +16,10 @@ export async function initBackupScheduler() {
   const cronExpression = buildCronExpression(schedule);
   currentTask = cron.schedule(cronExpression, async () => {
     try {
-      console.log('Running scheduled Darbar Sweets backup...');
       await runBackup({ groups: parseGroups(schedule.groups), destination: schedule.destination, type: 'AUTO' });
       await cleanupOldBackups(schedule.keepLast);
     } catch (error) {
-      console.error('Scheduled backup failed:', error);
+      console.error('Scheduled backup failed [REDACTED]');
     }
   });
 }

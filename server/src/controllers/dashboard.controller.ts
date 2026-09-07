@@ -1,8 +1,10 @@
+import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import dayjs from 'dayjs';
+import { AuthRequest } from '../middleware/auth.middleware';
 
-export const getDashboardStats = async (req: Request, res: Response) => {
+export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const today = dayjs().format('YYYY-MM-DD');
     const todayStart = new Date(today + 'T00:00:00');
@@ -42,6 +44,11 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const lowProductCount = products.filter((product) => product.currentStock <= product.minStockLevel).length;
     const lowRawMaterialCount = rawMaterials.filter((material) => material.currentStock <= material.minStockLevel).length;
 
+    if (req.user?.role === 'PRODUCTION_MANAGER') return res.json({ success: true, data: {
+      totalProducts, rawMaterialCount: rawMaterials.length, pendingOrders, pendingProductionOrders,
+      lowStockCount: lowProductCount + lowRawMaterialCount, lowProductCount, lowRawMaterialCount
+    } });
+
     res.json({
       success: true,
       data: {
@@ -61,7 +68,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
 };
 

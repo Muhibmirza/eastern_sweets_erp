@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = OFF');
+  await prisma.$executeRaw`PRAGMA foreign_keys = OFF`;
   await prisma.saleReturnItem.deleteMany();
   await prisma.saleReturn.deleteMany();
   await prisma.stockMovement.deleteMany();
@@ -38,7 +38,7 @@ async function main() {
   await prisma.customer.deleteMany();
   await prisma.employee.deleteMany();
   await prisma.chartOfAccounts.updateMany({ data: { balance: 0 } });
-  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+  await prisma.$executeRaw`PRAGMA foreign_keys = ON`;
 
   await prisma.user.updateMany({
     data: { isActive: true }

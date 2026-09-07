@@ -171,3 +171,18 @@ See [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for installation, LAN access, b
 ## Current Deployment
 
 The current packaged build uses the **Darbar Sweets** name, logo, receipt branding, and update endpoint. These are deployment-specific settings; the ERP workflow itself is suitable for other sweets and bakery businesses after configuration and branding changes.
+
+
+## Security configuration (v1.6.6)
+
+Change admin password on first login.
+
+Copy `server/.env.example` to `server/.env` and supply independent random JWT secrets and unique initial user passwords. Generate each JWT secret with `node -e "process.stdout.write(require('crypto').randomBytes(48).toString('hex'))"`. Initial user passwords must have at least 16 characters and at most 72 UTF-8 bytes. The seed and initial desktop bootstrap hash them with bcryptjs (cost 12); existing users are not reset.
+
+The packaged desktop generates installation-specific JWT secrets and initial passwords in `%APPDATA%/Darbar Sweets/runtime/server/.env` (under Electron's userData directory). The operator can read the initial admin password there on a new installation; it is never printed or bundled. Keep that file private. Updates retain it. Existing passwords remain unchanged; the switch away from shared JWT keys requires signing in again.
+
+Local development reads `server/.env`. The optional legacy Docker setup uses `docker compose --env-file server/.env up -d`; its existing database password was moved without changing an existing volume's credentials. Normal desktop operation uses SQLite and requires no Docker installation.
+
+Production CORS uses `http://localhost:5000` by default, matching the desktop server. A separately hosted web deployment must set CLIENT_URL to its exact trusted origin. Login and refresh share a limit of 10 requests per 15 minutes per IP; the API allows 200 requests per minute per IP. JWT lifetimes are 15 minutes and 30 days. Client environment variables must contain public configuration only.
+
+Run `npm run build --prefix server` then `node scripts/security-smoke.cjs` for the isolated security regression suite. It creates temporary databases under `.tmp`, never the shop database.

@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Response } from 'express';
 import dayjs from 'dayjs';
 import prisma from '../utils/prisma';
@@ -12,7 +13,7 @@ export const getProductionOrders = async (_req: AuthRequest, res: Response) => {
     });
     res.json({ success: true, data: orders });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load production orders' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load production orders') });
   }
 };
 
@@ -52,7 +53,7 @@ export const createProductionOrder = async (req: AuthRequest, res: Response) => 
     });
     res.status(201).json({ success: true, data: order });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not create production order' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not create production order') });
   }
 };
 
@@ -108,7 +109,7 @@ export const updateProductionOrder = async (req: AuthRequest, res: Response) => 
 
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message || 'Could not update production order' });
+    res.status(400).json({ success: false, message: publicError(error, 'Could not update production order') });
   }
 };
 
@@ -206,7 +207,7 @@ export const completeProductionOrder = async (req: AuthRequest, res: Response) =
     });
     res.json({ success: true, data: completed });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message || 'Could not complete production order' });
+    res.status(400).json({ success: false, message: publicError(error, 'Could not complete production order') });
   }
 };
 

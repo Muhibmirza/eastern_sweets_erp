@@ -2,7 +2,7 @@ import prisma from '../utils/prisma';
 import { defaultCategories } from './bootstrapService';
 
 export async function resetBusinessData() {
-  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = OFF');
+  await prisma.$executeRaw`PRAGMA foreign_keys = OFF`;
   try {
     await prisma.$transaction(async (tx) => {
       await tx.saleReturnItem.deleteMany();
@@ -45,7 +45,7 @@ export async function resetBusinessData() {
       }
     }, { timeout: 60000 });
   } finally {
-    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+    await prisma.$executeRaw`PRAGMA foreign_keys = ON`;
   }
 
   return {

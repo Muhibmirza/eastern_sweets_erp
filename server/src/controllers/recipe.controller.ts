@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -80,7 +81,7 @@ export const createRecipe = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json({ success: true, data: recipe });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not create recipe' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not create recipe') });
   }
 };
 
@@ -116,7 +117,7 @@ export const updateRecipe = async (req: AuthRequest, res: Response) => {
     });
     res.json({ success: true, data: recipe });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not update recipe' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not update recipe') });
   }
 };
 

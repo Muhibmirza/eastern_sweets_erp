@@ -3,7 +3,7 @@ import { createDailyClosing, getDailyClosing, getSales, getSale, getSaleByInvoic
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN', 'CASHIER'));
 router.get('/', getSales);
 router.get('/items', getSaleItems);
 router.get('/invoices', getInvoiceSuggestions);

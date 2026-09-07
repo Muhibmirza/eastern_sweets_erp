@@ -11,7 +11,7 @@ import {
 } from '../controllers/leave.controller';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN'));
 
 router.get('/employee/:employeeId', getEmployeeLeaveRequests);
 router.get('/balance/:employeeId', getLeaveBalance);

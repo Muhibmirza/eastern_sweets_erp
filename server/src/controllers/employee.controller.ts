@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import dayjs from 'dayjs';
@@ -42,7 +43,7 @@ export const getEmployee = async (req: Request, res: Response) => {
     });
     if (!employee) return res.status(404).json({ success: false, message: 'Employee not found' });
     res.json({ success: true, data: employee });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Server error' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Server error') }); }
 };
 
 export const createEmployee = async (req: Request, res: Response) => {
@@ -69,7 +70,7 @@ export const createEmployee = async (req: Request, res: Response) => {
       }
     });
     res.status(201).json({ success: true, data: employee });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 };
 
 export const updateEmployee = async (req: Request, res: Response) => {
@@ -101,7 +102,7 @@ export const updateEmployee = async (req: Request, res: Response) => {
       data
     });
     res.json({ success: true, data: employee });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Server error' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Server error') }); }
 };
 
 export const updateEmployeeStatus = async (req: Request, res: Response) => {
@@ -116,7 +117,7 @@ export const updateEmployeeStatus = async (req: Request, res: Response) => {
       }
     });
     res.json({ success: true, data: employee });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Server error' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Server error') }); }
 };
 
 // ─── ATTENDANCE ────────────────────────────────────────────────────────────────
@@ -147,7 +148,7 @@ export const markAttendance = async (req: any, res: Response) => {
       create: { employeeId, date: targetDate, status, checkIn, checkOut, markedBy: req.user.id }
     });
     res.json({ success: true, data: attendance });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 };
 
 const getPaidAttendanceDays = async (employeeId: string, month: number, year: number) => {
@@ -324,7 +325,7 @@ export const calculateSalary = async (req: any, res: Response) => {
     const preview = await salaryPreview(req.body);
     res.json({ success: true, data: preview });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message || 'Could not calculate salary' });
+    res.status(400).json({ success: false, message: publicError(error, 'Could not calculate salary') });
   }
 };
 
@@ -387,7 +388,7 @@ export const generateSalary = async (req: any, res: Response) => {
     });
 
     res.json({ success: true, data: { ...salary, employee: preview.employee } });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 };
 
 export const markSalaryPaid = async (req: any, res: Response) => {
@@ -504,7 +505,7 @@ export const createSalaryRevision = async (req: any, res: Response) => {
       return created;
     });
     res.status(201).json({ success: true, data: revision });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not create revision' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not create revision') }); }
 };
 
 export const getEmployeeAdvances = async (req: Request, res: Response) => {
@@ -531,7 +532,7 @@ export const deductAdvance = async (req: Request, res: Response) => {
       }
     });
     res.json({ success: true, data: advance });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not deduct advance' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not deduct advance') }); }
 };
 
 export const getEmployeeLoans = async (req: Request, res: Response) => {
@@ -561,7 +562,7 @@ export const createLoan = async (req: any, res: Response) => {
       return created;
     });
     res.status(201).json({ success: true, data: loan });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not create loan' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not create loan') }); }
 };
 
 export const recoverLoan = async (req: Request, res: Response) => {
@@ -584,7 +585,7 @@ export const recoverLoan = async (req: Request, res: Response) => {
       });
     });
     res.json({ success: true, data: updated });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not recover loan' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not recover loan') }); }
 };
 
 export const getEmployeeFines = async (req: Request, res: Response) => {
@@ -599,7 +600,7 @@ export const createFine = async (req: any, res: Response) => {
       data: { employeeId, amount: Number(amount || 0), reason, date: date ? new Date(date) : new Date(), salaryId }
     });
     res.status(201).json({ success: true, data: fine });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not create fine' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not create fine') }); }
 };
 
 export const getEmployeeLedger = async (req: Request, res: Response) => {
@@ -622,7 +623,7 @@ export const getEmployeeLedger = async (req: Request, res: Response) => {
     const totalDebit = debits.reduce((sum, item) => sum + item.amount, 0);
     const totalCredit = credits.reduce((sum, item) => sum + item.amount, 0);
     res.json({ success: true, data: { transactions, debits, credits, totalDebit, totalCredit, balance: totalDebit - totalCredit } });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message || 'Could not load ledger' }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Could not load ledger') }); }
 };
 
 export const deleteEmployee = async (req: Request, res: Response) => {
@@ -640,6 +641,6 @@ export const deleteEmployee = async (req: Request, res: Response) => {
     ]);
     res.json({ success: true, message: 'Employee deleted permanently' });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not delete employee' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not delete employee') });
   }
 };

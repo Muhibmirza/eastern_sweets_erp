@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: darbar_sweets_erp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: darbar123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in server/.env}
     ports:
       - "5432:5432"
     volumes:

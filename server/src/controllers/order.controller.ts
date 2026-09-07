@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import dayjs from 'dayjs';
@@ -89,7 +90,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
     res.status(201).json({ success: true, data: order });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
 };
 
@@ -138,7 +139,7 @@ export const updateOrder = async (req: Request, res: Response) => {
     });
     res.json({ success: true, data: order });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not update order' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not update order') });
   }
 };
 
@@ -174,7 +175,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     });
     res.json({ success: true, data: order });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Server error' });
+    res.status(500).json({ success: false, message: publicError(error, 'Server error') });
   }
 };
 
@@ -186,7 +187,7 @@ export const deleteOrder = async (req: Request, res: Response) => {
     await prisma.order.delete({ where: { id: req.params.id } });
     res.json({ success: true, data: order, message: 'Order deleted' });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not delete order' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not delete order') });
   }
 };
 

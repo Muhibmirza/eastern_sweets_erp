@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Router } from 'express';
 import {
   calculateSalary,
@@ -30,7 +31,7 @@ import prisma from '../utils/prisma';
 
 // Employee
 export const employeeRouter = Router();
-employeeRouter.use(authenticate);
+employeeRouter.use(authenticate, authorize('ADMIN'));
 employeeRouter.get('/', getEmployees);
 employeeRouter.post('/', authorize('ADMIN'), createEmployee);
 employeeRouter.put('/:id', authorize('ADMIN'), updateEmployee);
@@ -47,7 +48,7 @@ employeeRouter.get('/:id', getEmployee);
 
 // Attendance
 export const attendanceRouter = Router();
-attendanceRouter.use(authenticate);
+attendanceRouter.use(authenticate, authorize('ADMIN'));
 attendanceRouter.get('/', getTodayAttendance);
 attendanceRouter.get('/today', getTodayAttendance);
 attendanceRouter.get('/monthly', getMonthlyAttendance);
@@ -63,7 +64,7 @@ attendanceRouter.get('/:id', async (req, res) => {
 
 // Salary
 export const salaryRouter = Router();
-salaryRouter.use(authenticate);
+salaryRouter.use(authenticate, authorize('ADMIN'));
 salaryRouter.get('/', async (req, res) => {
   const { month, year, isPaid } = req.query;
   const where: any = {};
@@ -79,7 +80,7 @@ salaryRouter.get('/:id/payslip', getPayslipById);
 salaryRouter.patch('/:id/pay', authorize('ADMIN'), markSalaryPaid);
 
 export const loanRouter = Router();
-loanRouter.use(authenticate);
+loanRouter.use(authenticate, authorize('ADMIN'));
 loanRouter.post('/', authorize('ADMIN'), createLoan);
 loanRouter.patch('/supplier/:id', authorize('ADMIN'), async (req, res) => {
   try {
@@ -96,11 +97,11 @@ loanRouter.patch('/supplier/:id', authorize('ADMIN'), async (req, res) => {
     });
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not update supplier advance deduction' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not update supplier advance deduction') });
   }
 });
 loanRouter.post('/:id/recover', authorize('ADMIN'), recoverLoan);
 
 export const fineRouter = Router();
-fineRouter.use(authenticate);
+fineRouter.use(authenticate, authorize('ADMIN'));
 fineRouter.post('/', authorize('ADMIN'), createFine);

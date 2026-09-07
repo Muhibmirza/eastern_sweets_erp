@@ -4,7 +4,7 @@ import { createAdvance, getAdvances, getEmployeeAdvances, recoverAdvance } from 
 import { deductAdvance } from '../controllers/employee.controller';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN'));
 
 router.get('/', getAdvances);
 router.get('/employee/:employeeId', getEmployeeAdvances);

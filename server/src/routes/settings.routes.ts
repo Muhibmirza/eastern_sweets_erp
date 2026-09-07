@@ -1,3 +1,6 @@
+import { publicUserSelect } from '../utils/userSelect';
+import { body } from 'express-validator';
+import { validateAuth } from './auth.routes';
 import { Router } from 'express';
 import fs from 'fs';
 import os from 'os';
@@ -13,6 +16,7 @@ import { resetBusinessData } from '../services/maintenanceService';
 const router = Router();
 const restoreUpload = multer({
   dest: path.join(os.tmpdir(), 'darbar-sweets-restore'),
+  fileFilter: (_req, file, cb) => { if (!['application/octet-stream', 'application/x-sqlite3', 'application/vnd.sqlite3'].includes(file.mimetype)) return cb(Object.assign(new Error('File type not allowed'), { status: 400 })); cb(null, true); },
   limits: { fileSize: 1024 * 1024 * 1024 }
 });
 
@@ -193,24 +197,24 @@ router.get('/users', authorize('ADMIN'), async (req, res) => {
   res.json({ success: true, data: users });
 });
 
-router.post('/users', authorize('ADMIN'), async (req, res) => {
+router.post('/users', authorize('ADMIN'), body('email').isString().trim().isEmail().toLowerCase(), body('name').isString().trim().notEmpty(), body('password').isString().isLength({ min: 6, max: 72 }), body('role').isIn(['ADMIN', 'PRODUCTION_MANAGER', 'CASHIER', 'STAFF']), validateAuth, async (req, res) => {
   const bcrypt = await import('bcryptjs');
   const { name, email, password, role } = req.body;
   const hashed = await bcrypt.default.hash(password, 12);
-  const user = await prisma.user.create({ data: { name, email, password: hashed, role } });
-  const { password: _, ...u } = user;
+  const user = await prisma.user.create({ data: { name, email, password: hashed, role }, select: publicUserSelect });
+  const u = user;
   res.status(201).json({ success: true, data: u });
 });
 
-router.patch('/users/:id', authorize('ADMIN'), async (req, res) => {
+router.patch('/users/:id', authorize('ADMIN'), body('password').optional({ values: 'falsy' }).isString().isLength({ min: 6, max: 72 }), body('role').optional().isIn(['ADMIN', 'PRODUCTION_MANAGER', 'CASHIER', 'STAFF']), body('isActive').optional().isBoolean({ strict: true }), validateAuth, async (req, res) => {
   const bcrypt = await import('bcryptjs');
   const { isActive, role, password } = req.body;
   const data: any = {};
   if (isActive !== undefined) data.isActive = isActive;
   if (role) data.role = role;
   if (password) data.password = await bcrypt.default.hash(password, 12);
-  const user = await prisma.user.update({ where: { id: req.params.id }, data });
-  const { password: _, ...u } = user;
+  const user = await prisma.user.update({ where: { id: req.params.id }, data, select: publicUserSelect });
+  const u = user;
   res.json({ success: true, data: u });
 });
 

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getCashBookReport, getDailyReport, getMonthlyReport, getPayrollReport, getProductSalesReport, getProfitLossReport, getStockValuationReport, getSupplierOutstandingReport } from '../controllers/report.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN'));
 router.get('/daily', getDailyReport);
 router.get('/weekly', getDailyReport);
 router.get('/monthly', getMonthlyReport);

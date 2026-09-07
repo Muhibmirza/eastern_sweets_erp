@@ -1,3 +1,4 @@
+import { bootstrapPassword } from '../config/environment';
 import bcrypt from 'bcryptjs';
 import prisma from '../utils/prisma';
 
@@ -80,9 +81,9 @@ export async function ensureDefaultData() {
   const userCount = await prisma.user.count();
   if (userCount > 0) return;
 
-  const adminPassword = await bcrypt.hash('Admin@123', 12);
-  const cashierPassword = await bcrypt.hash('Cashier@123', 12);
-  const productionPassword = await bcrypt.hash('Production@123', 12);
+  const adminPassword = await bcrypt.hash(bootstrapPassword('SEED_ADMIN_PASSWORD'), 12);
+  const cashierPassword = await bcrypt.hash(bootstrapPassword('SEED_CASHIER_PASSWORD'), 12);
+  const productionPassword = await bcrypt.hash(bootstrapPassword('SEED_PRODUCTION_PASSWORD'), 12);
 
   const admin = await prisma.user.create({
     data: { name: 'Admin', email: 'admin@darbarsweets.com', password: adminPassword, role: 'ADMIN', isActive: true }

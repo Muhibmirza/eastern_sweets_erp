@@ -49,7 +49,6 @@ app.on('second-instance', () => {
 
 function writeLog(message) {
   const line = `[${new Date().toISOString()}] ${message}\n`;
-  console.log(message);
   if (logFile) fs.appendFileSync(logFile, line);
 }
 
@@ -114,6 +113,21 @@ function serverDatabaseUrl() {
   return `file:${appDatabasePath().replace(/\\/g, '/')}`;
 }
 
+function serverSecrets() {
+  const envPath = runtimePath('server', '.env');
+  const dotenv = require(resourcePath('server', 'node_modules', 'dotenv'));
+  const values = fs.existsSync(envPath) ? dotenv.parse(fs.readFileSync(envPath)) : {};
+  for (const key of ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'SEED_ADMIN_PASSWORD', 'SEED_CASHIER_PASSWORD', 'SEED_PRODUCTION_PASSWORD']) {
+    if (process.env[key]) values[key] = process.env[key];
+    if (!values[key]) values[key] = require('crypto').randomBytes(key.startsWith('JWT_') ? 48 : 24).toString('hex');
+  }
+  values.DATABASE_URL = serverDatabaseUrl();
+  values.CLIENT_URL = SERVER_URL;
+  fs.mkdirSync(path.dirname(envPath), { recursive: true });
+  fs.writeFileSync(envPath, Object.entries(values).map(([key, value]) => `${key}=${JSON.stringify(value)}`).join('\n') + '\n', { mode: 0o600 });
+  return values;
+}
+
 function checkBackendHealth(timeoutMs = 2500) {
   return new Promise((resolve) => {
     const request = http.get(`${SERVER_URL}/api/health`, { timeout: timeoutMs }, (response) => {
@@ -169,11 +183,10 @@ function startBackendServer() {
       ELECTRON_RUN_AS_NODE: '1',
       NODE_ENV: 'production',
       PORT: String(SERVER_PORT),
-      CLIENT_URL: '*',
+      ...serverSecrets(),
+      CLIENT_URL: SERVER_URL,
       DATABASE_URL: serverDatabaseUrl(),
       UPLOAD_DIR: runtimePath('uploads'),
-      JWT_SECRET: process.env.JWT_SECRET || 'darbar-sweets-production-secret-CHANGE-THIS',
-      JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'darbar-sweets-refresh-production-secret-CHANGE-THIS'
     },
     windowsHide: true
   });

@@ -1,11 +1,14 @@
+import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
+import { validateEnvironment } from './config/environment';
+import rateLimit from 'express-rate-limit';
+import { protectResponses, validateWriteNumbers } from './middleware/security.middleware';
 import path from 'path';
 
-dotenv.config();
+try { validateEnvironment(); } catch (error: any) { console.error(error.message); process.exit(1); }
 
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
@@ -39,23 +42,29 @@ const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled rejection:', reason);
+  console.error('Unhandled rejection [REDACTED]');
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception:', error);
+  console.error('Uncaught exception [REDACTED]');
 });
 
 app.use(helmet({
-  contentSecurityPolicy: false
+  contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], imgSrc: ["'self'", 'data:', 'blob:'], upgradeInsecureRequests: null } }
 }));
 app.use(cors({
-  origin: process.env.CLIENT_URL === '*' ? true : process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true
 }));
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan(':method :status :response-time ms'));
+app.use(protectResponses);
+app.use('/api/', rateLimit({ windowMs: 60 * 1000, max: 200, message: { success: false, message: 'Rate limit exceeded.' }, standardHeaders: true, legacyHeaders: false }));
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { success: false, message: 'Too many attempts. Try again later.' }, standardHeaders: true, legacyHeaders: false });
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/refresh-token', authLimiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/', validateWriteNumbers);
 app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')));
 
 app.use('/api/auth', authRoutes);
@@ -100,18 +109,17 @@ if (process.env.NODE_ENV === 'production' && require('fs').existsSync(frontendDi
 }
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err.stack);
+  console.error('[ERROR]', { name: err?.name, code: err?.code });
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error'
+    message: 'Something went wrong. Please try again.'
   });
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Darbar Sweets running on http://0.0.0.0:${PORT}`);
   ensureDefaultData()
     .then(() => initBackupScheduler())
-    .catch((error) => console.error('Startup bootstrap failed:', error));
+    .catch((error) => console.error('Startup bootstrap failed [REDACTED]'));
 });
 
 server.keepAliveTimeout = 65000;

@@ -1,9 +1,10 @@
+import { publicError } from '../utils/publicError';
 import { Router } from 'express';
 import prisma from '../utils/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN', 'CASHIER'));
 
 router.get('/', async (req, res) => {
   const { search, page = '1', limit = '20' } = req.query;
@@ -67,7 +68,7 @@ router.delete('/:id', authorize('ADMIN'), async (req, res) => {
     const customer = await prisma.customer.update({ where: { id: req.params.id }, data: { isActive: false } });
     res.json({ success: true, data: customer, message: 'Deleted' });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message || 'Could not delete customer' });
+    res.status(400).json({ success: false, message: publicError(error, 'Could not delete customer') });
   }
 });
 

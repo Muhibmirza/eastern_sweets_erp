@@ -17,7 +17,7 @@ import {
 } from '../controllers/accounting.controller';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN'));
 
 router.get('/chart-of-accounts', getChartOfAccounts);
 router.post('/chart-of-accounts', authorize('ADMIN'), createAccount);

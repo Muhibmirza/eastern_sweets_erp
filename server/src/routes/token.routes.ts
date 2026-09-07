@@ -1,9 +1,10 @@
+import { publicError } from '../utils/publicError';
 import { Router } from 'express';
 import prisma from '../utils/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN', 'CASHIER'));
 
 const parseTokenItems = (token: any) => ({ ...token, items: token.items ? JSON.parse(token.items) : [] });
 
@@ -86,7 +87,7 @@ router.post('/', authorize('ADMIN', 'CASHIER'), async (req: any, res) => {
     });
     res.status(201).json({ success: true, data: parseTokenItems(token) });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not create token' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not create token') });
   }
 });
 

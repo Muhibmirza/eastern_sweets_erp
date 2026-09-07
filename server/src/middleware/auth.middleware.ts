@@ -1,3 +1,4 @@
+import { publicUserSelect } from '../utils/userSelect';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import prisma from '../utils/prisma';
@@ -12,7 +13,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     if (!token) return res.status(401).json({ success: false, message: 'Access token required' });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: publicUserSelect });
     if (!user || !user.isActive) return res.status(401).json({ success: false, message: 'Invalid or inactive user' });
 
     req.user = { id: user.id, role: user.role, name: user.name, email: user.email };

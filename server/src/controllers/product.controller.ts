@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 
@@ -56,7 +57,7 @@ export const createProduct = async (req: Request, res: Response) => {
     });
     res.status(201).json({ success: true, data: product });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
 };
 
@@ -111,7 +112,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
     const product = await prisma.product.update({ where: { id: req.params.id }, data: { isActive: false } });
     res.json({ success: true, data: product, message: 'Product deleted' });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not delete product' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not delete product') });
   }
 };
 
@@ -163,7 +164,7 @@ export const addProductStock = async (req: any, res: Response) => {
 
     res.json({ success: true, data: updatedProduct });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not add stock' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not add stock') });
   }
 };
 

@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import dayjs from 'dayjs';
@@ -88,7 +89,7 @@ export const getSaleByInvoice = async (req: Request, res: Response) => {
     }
     res.json({ success: true, data: sale });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Server error' });
+    res.status(500).json({ success: false, message: publicError(error, 'Server error') });
   }
 };
 
@@ -323,7 +324,7 @@ export const getSaleItems = async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load sales items' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load sales items') });
   }
 };
 
@@ -362,7 +363,7 @@ export const getInvoiceSuggestions = async (req: Request, res: Response) => {
       }))
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load invoices' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load invoices') });
   }
 };
 
@@ -502,7 +503,7 @@ export const createSale = async (req: any, res: Response) => {
 
     res.status(201).json({ success: true, data: sale });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
 };
 
@@ -552,7 +553,7 @@ export const returnSale = async (req: any, res: Response) => {
 
     res.status(201).json({ success: true, data: result });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
 };
 
@@ -578,7 +579,7 @@ export const getSaleReturns = async (_req: Request, res: Response) => {
       }))
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load sale returns' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load sale returns') });
   }
 };
 

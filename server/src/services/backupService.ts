@@ -1,3 +1,4 @@
+import { Prisma, PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 import { execFile, spawn } from 'child_process';
@@ -96,9 +97,6 @@ function quoteIdentifier(value: string) {
   return `"${value.replace(/"/g, '""')}"`;
 }
 
-function quoteSqlString(value: string) {
-  return `'${value.replace(/'/g, "''")}'`;
-}
 
 function sqliteSidecarPaths(dbPath: string) {
   return [`${dbPath}-wal`, `${dbPath}-shm`, `${dbPath}-journal`];
@@ -276,7 +274,7 @@ export async function runBackup({
       const dbPath = databaseFilePath();
       if (!fs.existsSync(dbPath)) throw new Error('Database file was not found for backup.');
       try {
-        await prisma.$executeRawUnsafe(`VACUUM INTO ${quoteSqlString(filePath)}`);
+        await prisma.$executeRaw`VACUUM INTO ${filePath}`;
       } catch {
         await prisma.$disconnect();
         removeSQLiteSidecars(filePath);
@@ -369,39 +367,39 @@ export async function mergeFullDatabaseBackups(uploadPaths: string[]) {
   if (fs.existsSync(dbPath)) fs.copyFileSync(dbPath, previousCopy);
   removeSQLiteSidecars(dbPath);
 
-  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = OFF');
+  // ATTACH is connection-local; keep the merge on one dedicated SQLite connection.
+  const databaseUrl = process.env.DATABASE_URL!;
+  const prisma = new PrismaClient({ datasources: { db: { url: `${databaseUrl}${databaseUrl.includes('?') ? '&' : '?'}connection_limit=1` } } });
+  await prisma.$executeRaw`PRAGMA foreign_keys = OFF`;
 
   const mergedTables = new Set<string>();
   try {
     for (let index = 0; index < uploadPaths.length; index += 1) {
       const alias = `restore${index}`;
-      await prisma.$executeRawUnsafe(`ATTACH DATABASE ${quoteSqlString(uploadPaths[index])} AS ${quoteIdentifier(alias)}`);
+      await prisma.$executeRaw`ATTACH DATABASE ${uploadPaths[index]} AS ${Prisma.raw(quoteIdentifier(alias))}`;
       try {
-        const tables = await prisma.$queryRawUnsafe<Array<{ name: string }>>(
-          `SELECT name FROM ${quoteIdentifier(alias)}.sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name != '_prisma_migrations'`
-        );
+        const tables = await prisma.$queryRaw<Array<{ name: string }>>`SELECT name FROM ${Prisma.raw(quoteIdentifier(alias))}.sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name != '_prisma_migrations'`;
 
         for (const table of tables) {
           const tableName = table.name;
+          if (!Prisma.dmmf.datamodel.models.some(model => (model.dbName || model.name) === tableName)) continue;
           const [mainColumns, backupColumns] = await Promise.all([
-            prisma.$queryRawUnsafe<Array<{ name: string }>>(`PRAGMA main.table_info(${quoteIdentifier(tableName)})`),
-            prisma.$queryRawUnsafe<Array<{ name: string }>>(`PRAGMA ${quoteIdentifier(alias)}.table_info(${quoteIdentifier(tableName)})`)
+            prisma.$queryRaw<Array<{ name: string }>>`SELECT name FROM pragma_table_info(${tableName}, 'main')`,
+            prisma.$queryRaw<Array<{ name: string }>>`SELECT name FROM pragma_table_info(${tableName}, ${alias})`
           ]);
           const mainColumnNames = new Set(mainColumns.map((column) => column.name));
           const commonColumns = backupColumns.map((column) => column.name).filter((name) => mainColumnNames.has(name));
           if (!commonColumns.length) continue;
           const columnList = commonColumns.map(quoteIdentifier).join(', ');
-          await prisma.$executeRawUnsafe(
-            `INSERT OR REPLACE INTO main.${quoteIdentifier(tableName)} (${columnList}) SELECT ${columnList} FROM ${quoteIdentifier(alias)}.${quoteIdentifier(tableName)}`
-          );
+          await prisma.$executeRaw`INSERT OR REPLACE INTO main.${Prisma.raw(quoteIdentifier(tableName))} (${Prisma.raw(columnList)}) SELECT ${Prisma.raw(columnList)} FROM ${Prisma.raw(quoteIdentifier(alias))}.${Prisma.raw(quoteIdentifier(tableName))}`;
           mergedTables.add(tableName);
         }
       } finally {
-        await prisma.$executeRawUnsafe(`DETACH DATABASE ${quoteIdentifier(alias)}`);
+        await prisma.$executeRaw`DETACH DATABASE ${Prisma.raw(quoteIdentifier(alias))}`;
       }
     }
   } finally {
-    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+    try { await prisma.$executeRaw`PRAGMA foreign_keys = ON`; } finally { await prisma.$disconnect(); }
   }
 
   return {

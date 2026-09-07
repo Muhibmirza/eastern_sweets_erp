@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -31,7 +32,7 @@ export const getRawMaterials = async (req: AuthRequest, res: Response) => {
     }));
     res.json({ success: true, data: lowStock === 'true' ? enriched.filter((material) => material.isLow) : enriched });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load raw materials' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load raw materials') });
   }
 };
 
@@ -51,7 +52,7 @@ export const getRawMaterial = async (req: AuthRequest, res: Response) => {
     if (!material || !material.isActive) return res.status(404).json({ success: false, message: 'Raw material not found' });
     res.json({ success: true, data: { ...material, isLow: material.currentStock <= material.minStockLevel } });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not load raw material' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not load raw material') });
   }
 };
 
@@ -96,7 +97,7 @@ export const createRawMaterial = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json({ success: true, data: { ...material, isLow: material.currentStock <= material.minStockLevel } });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not create raw material' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not create raw material') });
   }
 };
 
@@ -121,7 +122,7 @@ export const updateRawMaterial = async (req: AuthRequest, res: Response) => {
     });
     res.json({ success: true, data: { ...material, isLow: material.currentStock <= material.minStockLevel } });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not update raw material' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not update raw material') });
   }
 };
 
@@ -138,7 +139,7 @@ export const deleteRawMaterial = async (req: AuthRequest, res: Response) => {
       message: recipeUses ? 'Raw material deactivated. It is still referenced by existing recipes.' : 'Raw material deleted'
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not delete raw material' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not delete raw material') });
   }
 };
 
@@ -188,7 +189,7 @@ export const stockIn = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json({ success: true, data: result });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not add stock' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not add stock') });
   }
 };
 
@@ -222,6 +223,6 @@ export const stockOut = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json({ success: true, data: result });
   } catch (error: any) {
-    res.status(error.message?.includes('Only ') ? 400 : 500).json({ success: false, message: error.message || 'Could not deduct stock' });
+    res.status(error.message?.includes('Only ') ? 400 : 500).json({ success: false, message: publicError(error, 'Could not deduct stock') });
   }
 };

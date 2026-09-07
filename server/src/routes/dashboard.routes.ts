@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { getDashboardStats, getRevenueChart, getTopProducts, getRecentOrders } from '../controllers/dashboard.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN', 'PRODUCTION_MANAGER'));
 router.get('/stats', getDashboardStats);
-router.get('/revenue-chart', getRevenueChart);
-router.get('/top-products', getTopProducts);
+router.get('/revenue-chart', authorize('ADMIN'), getRevenueChart);
+router.get('/top-products', authorize('ADMIN'), getTopProducts);
 router.get('/recent-orders', getRecentOrders);
 export default router;

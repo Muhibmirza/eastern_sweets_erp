@@ -1,3 +1,4 @@
+import { publicError } from '../utils/publicError';
 import { Router } from 'express';
 import prisma from '../utils/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
@@ -70,7 +71,7 @@ supplierRouter.patch('/advances/:advanceId/recover', authorize('ADMIN'), async (
     });
     res.json({ success: true, data: result });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not recover advance' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not recover advance') });
   }
 });
 
@@ -111,7 +112,7 @@ supplierRouter.post('/:id/advances', authorize('ADMIN'), async (req: any, res) =
     });
     res.status(201).json({ success: true, data: advance });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not create supplier advance' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not create supplier advance') });
   }
 });
 
@@ -223,7 +224,7 @@ supplierRouter.get('/:id/receipt', async (req, res) => {
       }
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not generate supplier receipt' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not generate supplier receipt') });
   }
 });
 
@@ -458,7 +459,7 @@ supplierRouter.post('/:id/payment', authorize('ADMIN'), async (req: any, res) =>
       };
     });
     res.status(201).json({ success: true, data: result });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 });
 
 supplierRouter.get('/:id/payments', async (req, res) => {
@@ -537,7 +538,7 @@ supplierRouter.post('/:id/return', authorize('ADMIN', 'PRODUCTION_MANAGER'), asy
 
     res.status(201).json({ success: true, data: result });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message || 'Could not record supplier return' });
+    res.status(500).json({ success: false, message: publicError(error, 'Could not record supplier return') });
   }
 });
 
@@ -611,7 +612,7 @@ purchaseRouter.post('/', authorize('ADMIN', 'PRODUCTION_MANAGER'), async (req: a
     });
 
     res.status(201).json({ success: true, data: purchase });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 });
 
 purchaseRouter.put('/:id', authorize('ADMIN'), async (req, res) => {
@@ -673,7 +674,7 @@ const createStockAdjustment = async (req: any, res: any) => {
     }
 
     res.status(201).json({ success: true, data: movement });
-  } catch (error: any) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error: any) { res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') }); }
 };
 
 stockRouter.post('/movements', authorize('ADMIN', 'PRODUCTION_MANAGER'), createStockAdjustment);
