@@ -23,13 +23,13 @@ The SQLite `file:` URL identifies a local file and contains no password. It rema
 
 | Data | Collection and storage | Authorized use |
 |---|---|---|
-| Login email/password | Login form ? auth controller ? User lookup/bcrypt comparison | Public login; no password in response or logs |
-| User name/email/role/password | Settings user endpoints ? User | ADMIN only; explicit public selections, bcryptjs cost 12 |
-| Customer name/phone/address | Customer and order forms ? Customer/Order | ADMIN/CASHIER customer records; authenticated shop order workflow |
-| Employee phone/CNIC/address/wages | Employee form ? Employee | ADMIN-only employee and related HR APIs |
-| Attendance/leave | HR forms ? Attendance/LeaveRequest | ADMIN-only backend routes |
-| Salary, advances, loans, fines | Payroll and employee forms ? Salary/EmployeeAdvance/EmployeeLoan/EmployeeFine | ADMIN-only HR, salary, accounting and payroll reports |
-| Supplier contacts/payments/advances | Supplier/purchase forms ? supplier and purchase records | Existing shared shop purchasing reads; writes retain their existing role restrictions |
+| Login email/password | Login form -> auth controller -> User lookup/bcrypt comparison | Public login; no password in response or logs |
+| User name/email/role/password | Settings user endpoints -> User | ADMIN only; explicit public selections, bcryptjs cost 12 |
+| Customer name/phone/address | Customer and order forms -> Customer/Order | ADMIN/CASHIER customer records; authenticated shop order workflow |
+| Employee phone/CNIC/address/wages | Employee form -> Employee | ADMIN-only employee and related HR APIs |
+| Attendance/leave | HR forms -> Attendance/LeaveRequest | ADMIN-only backend routes |
+| Salary, advances, loans, fines | Payroll and employee forms -> Salary/EmployeeAdvance/EmployeeLoan/EmployeeFine | ADMIN-only HR, salary, accounting and payroll reports |
+| Supplier contacts/payments/advances | Supplier/purchase forms -> supplier and purchase records | Existing shared shop purchasing reads; writes retain their existing role restrictions |
 | Backups and audit history | Server-generated files/database records | ADMIN only; backups necessarily include data and password hashes needed for restoration |
 
 Normal JSON responses recursively omit password/hash fields. Login and password-change queries explicitly select the hash only for bcrypt comparison; it is never returned. Refresh/authentication queries use public selections. No authentication cookies are used, so cookie flags are not applicable. Tokens retain the existing client storage flow. Ordinary app entity IDs are retained because the UI needs them for detail views, updates, receipts and relationships. Sensitive employee data is protected at route boundaries. Production-manager dashboard responses omit sales totals while preserving production and stock metrics.
@@ -54,6 +54,34 @@ The live schema uses SQLite, not PostgreSQL. Optional Docker/PostgreSQL backup s
 ## Verification
 
 `npm run build --prefix server` passed. `node scripts/security-smoke.cjs` passed 98 assertions against a disposable database: valid role logins, bcrypt storage, token lifetimes, refresh, all mounted protected API groups, sensitive ID and role denial, malformed auth/numbers, rejected upload MIME types, async error masking, CSP/CORS, production dashboard minimization, quoted-path SQLite backup/merge, both rate limits, and a valid cashier sale with stock movement. Release build and artifact checks are recorded in the release delivery message.
+
+## Release artifact verification
+
+The requested `scripts\build-release.bat` completed successfully. A final desktop-only packaging pass included removal of the migration engine's RUST_LOG debug flag.
+
+- Installer: `desktop/release/Darbar Sweets Setup 1.6.6.exe`, 360,099,665 bytes.
+- Portable directory: `desktop/release/win-unpacked/`, containing both the main ERP and backup-tool executables.
+- Update metadata: `desktop/release/latest.yml`; version, filename, size, and both SHA-512 entries match the installer.
+- Windows executable version: 1.6.6; product version: 1.6.6.0.
+- The packaged launcher matches final source; packaged backend and frontend match the verified build outputs.
+- All 5,320 packaged text files checked contained none of the local JWT, bootstrap, or PostgreSQL secrets.
+- The packaged server passed the same 98 isolated security/valid-sale assertions. Packaged desktop dependencies initialized successfully in a hidden Electron 30.5.1 test process without opening the ERP or shop database.
+- Unconfigured example JWT secrets and seed passwords fail the existing validation; templates cannot serve as usable default credentials.
+- The blueprint PDF was rendered and visually verified across nine pages.
+
+## Dependency audit findings
+
+The requested source hardening is not a clean dependency-audit claim. Existing dependency versions were retained under the instruction to implement only the listed changes; no broad or breaking dependency upgrades were applied.
+
+| Dependency scope | Reported outstanding advisories |
+|---|---|
+| Server production dependencies | 5 moderate: body-parser, express, node-cron, qs, uuid |
+| Desktop production dependencies | 2 high: axios, js-yaml |
+| Backup-tool production dependencies | None reported |
+| Full desktop dependency tree, including development/build tools | 14 total: 1 moderate, 12 high, 1 critical |
+| Full backup-tool dependency tree, including development/build tools | 13 total: 1 moderate, 11 high, 1 critical |
+
+Counts reflect npm audit during this build on 2026-09-07 and include transitive packages; they are not a count of independently demonstrated exploits. The runtime and full-tree rows overlap and must not be summed.
 
 ## Route inventory
 

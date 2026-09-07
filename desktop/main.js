@@ -247,7 +247,6 @@ function runMigrations() {
       env: {
         ...process.env,
         ELECTRON_RUN_AS_NODE: '1',
-        RUST_LOG: 'debug',
         DATABASE_URL: migrationDatabaseUrl()
       },
       windowsHide: true

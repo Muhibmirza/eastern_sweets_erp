@@ -1,6 +1,6 @@
 {
   "name": "darbar-sweets-erp",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "Darbar Sweets - Point of Sale & Management System",
   "main": "main.js",
   "author": "Darbar Sweets",
@@ -19,7 +19,7 @@
   "build": {
     "appId": "com.darbarsweets.erp",
     "productName": "Darbar Sweets",
-    "artifactName": "Darbar-Sweets-Setup-${version}.${ext}",
+    "artifactName": "Darbar Sweets Setup ${version}.${ext}",
     "directories": {
       "output": "release"
     },
