@@ -1,4 +1,4 @@
-# Security audit — Darbar Sweets ERP v1.6.6
+# Security audit — Eastern Sweets ERP v1.6.6
 
 Audit date: 2026-09-07. Scope: first-party source, scripts, manifests, local environment configuration, route declarations, data flows, and the newly built release. Dependency packages, Git history, historical installers, and existing shop database records are not rewritten. No UI or database-engine migration is included.
 
@@ -59,7 +59,7 @@ The live schema uses SQLite, not PostgreSQL. Optional Docker/PostgreSQL backup s
 
 The requested `scripts\build-release.bat` completed successfully. A final desktop-only packaging pass included removal of the migration engine's RUST_LOG debug flag.
 
-- Installer: `desktop/release/Darbar Sweets Setup 1.6.6.exe`, 360,099,665 bytes.
+- Installer: `desktop/release/Eastern Sweets Setup 1.6.6.exe`, 360,099,665 bytes.
 - Portable directory: `desktop/release/win-unpacked/`, containing both the main ERP and backup-tool executables.
 - Update metadata: `desktop/release/latest.yml`; version, filename, size, and both SHA-512 entries match the installer.
 - Windows executable version: 1.6.6; product version: 1.6.6.0.

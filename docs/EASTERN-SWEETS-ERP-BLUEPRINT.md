@@ -1,4 +1,4 @@
-# Darbar Sweets ERP — Project Blueprint
+# Eastern Sweets ERP — Project Blueprint
 
 **Release:** 1.6.6 · **Date:** 7 September 2026 · **Location:** Sukkur, Sindh
 
@@ -10,7 +10,7 @@ This blueprint brings together the PRD, TRD, application flow, UI/UX rules, back
 
 ### One-line pitch
 
-Darbar Sweets ERP helps the Darbar Sweets halwai shop in Sukkur, Sindh manage POS billing, inventory, production, HR, and accounting from one desktop application.
+Eastern Sweets ERP helps the Eastern Sweets halwai shop in Sukkur, Sindh manage POS billing, inventory, production, HR, and accounting from one desktop application.
 
 ### The problem
 
@@ -217,7 +217,7 @@ The server compiles successfully. The isolated security suite passes 98 assertio
 
 ### Release outputs
 
-- `desktop/release/Darbar Sweets Setup 1.6.6.exe`
+- `desktop/release/Eastern Sweets Setup 1.6.6.exe`
 - `desktop/release/win-unpacked/`
 - `desktop/release/latest.yml`
 

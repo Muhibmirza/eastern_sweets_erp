@@ -16,12 +16,17 @@ export type TabKey =
   | 'settings'
   | 'sales'
   | 'closing'
-  | 'sales-returns';
+  | 'sales-returns'
+  | 'packaging';
 
 export const PERMISSIONS: Record<Role, { tabs: TabKey[]; dashboardWidgets: string[] }> = {
   ADMIN: {
-    tabs: ['dashboard', 'pos', 'sales', 'closing', 'inventory', 'production', 'orders', 'customers', 'suppliers', 'expenses', 'hr', 'payroll', 'accounting', 'reports', 'settings', 'sales-returns'],
+    tabs: ['dashboard', 'pos', 'sales', 'closing', 'inventory', 'production', 'orders', 'customers', 'suppliers', 'expenses', 'hr', 'payroll', 'accounting', 'reports', 'settings', 'packaging', 'sales-returns'],
     dashboardWidgets: ['all']
+  },
+  MANAGER: {
+    tabs: ['pos', 'inventory', 'packaging'],
+    dashboardWidgets: []
   },
   PRODUCTION_MANAGER: {
     tabs: ['dashboard', 'inventory', 'production', 'orders', 'suppliers'],
@@ -39,6 +44,7 @@ export const PERMISSIONS: Record<Role, { tabs: TabKey[]; dashboardWidgets: strin
 
 export const ROLE_LABELS: Record<Role, string> = {
   ADMIN: 'Admin',
+  MANAGER: 'Manager',
   PRODUCTION_MANAGER: 'Production Manager',
   CASHIER: 'Cashier',
   STAFF: 'Staff'
@@ -46,6 +52,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 export const ROLE_HOME: Record<Role, string> = {
   ADMIN: '/dashboard',
+  MANAGER: '/pos',
   PRODUCTION_MANAGER: '/production',
   CASHIER: '/pos',
   STAFF: '/unauthorized'

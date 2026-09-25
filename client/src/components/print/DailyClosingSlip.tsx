@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { pkr } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -8,7 +8,7 @@ export function DailyClosingSlip({ summary, cashier }: { summary: any; cashier?:
   const payment = (method: string) => paymentRows.find((row: any) => row.paymentMethod === method)?._sum?.netAmount || 0;
   return (
     <div className="thermal-print">
-      <div className="print-center"><img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>DAILY CLOSING</h2></div>
+      <div className="print-center"><img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>DAILY CLOSING</h2></div>
       <div className="print-line" />
       <div>Date: {dayjs(summary?.date).format('DD-MMM-YYYY')}</div>
       <div>Closed By: {cashier || '-'}</div>

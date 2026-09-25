@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { formatQuantity } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -11,7 +11,7 @@ export function TokenSlip({ token }: { token: any }) {
   return (
     <div className="thermal-print" style={{ margin: 0, padding: '0 0.25mm', width: '70mm', maxWidth: '70mm', fontFamily: '"Courier New", monospace, Arial, sans-serif', color: '#000', fontWeight: 900, overflow: 'hidden' }}>
       <div style={{ textAlign: 'center', marginBottom: '2px' }}>
-        <img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ display: 'block', width: '30mm', maxWidth: '30mm', height: 'auto', maxHeight: '32mm', objectFit: 'contain', margin: '0 auto' }} />
+        <img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ display: 'block', width: '30mm', maxWidth: '30mm', height: 'auto', maxHeight: '32mm', objectFit: 'contain', margin: '0 auto' }} />
       </div>
       <div style={{ textAlign: 'center', fontSize: '20pt', fontWeight: 900, lineHeight: 1 }}>TOKEN {token.tokenNumber}</div>
       <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }} />

@@ -4,7 +4,7 @@ import prisma from '../utils/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
-router.use(authenticate, authorize('ADMIN', 'CASHIER'));
+router.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER'));
 
 const parseTokenItems = (token: any) => ({ ...token, items: token.items ? JSON.parse(token.items) : [] });
 
@@ -39,7 +39,7 @@ router.get('/counter/next', async (_req, res) => {
   res.json({ success: true, data: { nextNumber: counter.nextNumber } });
 });
 
-router.post('/counter/reset', authorize('ADMIN', 'CASHIER'), async (_req, res) => {
+router.post('/counter/reset', authorize('ADMIN', 'MANAGER', 'CASHIER'), async (_req, res) => {
   await prisma.tokenCounter.upsert({
     where: { id: 'default' },
     update: { nextNumber: 1 },
@@ -58,7 +58,7 @@ router.get('/:id', async (req, res) => {
   res.json({ success: true, data: parseTokenItems(token) });
 });
 
-router.post('/', authorize('ADMIN', 'CASHIER'), async (req: any, res) => {
+router.post('/', authorize('ADMIN', 'MANAGER', 'CASHIER'), async (req: any, res) => {
   try {
     const { tokenNumber, items = [], totalAmount, saleId } = req.body;
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ success: false, message: 'Token items are required' });
@@ -91,7 +91,7 @@ router.post('/', authorize('ADMIN', 'CASHIER'), async (req: any, res) => {
   }
 });
 
-router.patch('/:id/complete', authorize('ADMIN', 'CASHIER'), async (req, res) => {
+router.patch('/:id/complete', authorize('ADMIN', 'MANAGER', 'CASHIER'), async (req, res) => {
   const token = await prisma.token.update({
     where: { id: req.params.id },
     data: { status: 'COMPLETED', completedAt: new Date(), saleId: req.body.saleId || null }
@@ -99,7 +99,7 @@ router.patch('/:id/complete', authorize('ADMIN', 'CASHIER'), async (req, res) =>
   res.json({ success: true, data: parseTokenItems(token) });
 });
 
-router.patch('/:id/cancel', authorize('ADMIN', 'CASHIER'), async (req, res) => {
+router.patch('/:id/cancel', authorize('ADMIN', 'MANAGER', 'CASHIER'), async (req, res) => {
   const token = await prisma.token.update({
     where: { id: req.params.id },
     data: { status: 'CANCELLED' }

@@ -33,6 +33,7 @@ const nav = [
   { key: 'sales', to: '/sales', label: 'Sales', icon: Receipt },
   { key: 'inventory', to: '/inventory', label: 'Inventory', icon: Boxes },
   { key: 'inventory', to: '/raw-materials', label: 'Raw Materials', icon: Boxes },
+  { key: 'inventory', to: '/inventory/kitchen', label: 'Kitchen', icon: ChefHat },
   { key: 'production', to: '/production', label: 'Production', icon: PackagePlus },
   { key: 'production', to: '/recipes', label: 'Recipes', icon: ChefHat },
   { key: 'orders', to: '/orders', label: 'Orders', icon: ClipboardList },
@@ -48,7 +49,8 @@ const nav = [
   { key: 'accounting', to: '/accounting', label: 'Accounting', icon: ScrollText },
   { key: 'reports', to: '/reports', label: 'Reports', icon: BarChart3 },
   { key: 'settings', to: '/settings', label: 'Settings', icon: Settings },
-  { key: 'settings', to: '/settings/backup', label: 'Backup', icon: DatabaseBackup }
+  { key: 'settings', to: '/settings/backup', label: 'Backup', icon: DatabaseBackup },
+  { key: 'packaging', to: '/settings/packaging', label: 'Packaging', icon: PackagePlus }
 ] satisfies Array<{ key: TabKey; to: string; label: string; icon: typeof LayoutDashboard }>;
 
 export function Layout() {
@@ -80,11 +82,11 @@ export function Layout() {
         <div className={`flex h-24 px-4 ${sidebarOpen ? 'items-center' : 'items-center justify-center'}`}>
           <div className={`flex min-w-0 items-center ${sidebarOpen ? 'w-full gap-3' : 'justify-center'}`}>
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[#ead8bb]">
-              <img src="/assets/darbar-sweets-logo.png" alt="Darbar Sweets" className="h-9 w-9 object-contain" />
+              <img src="/eastern-sweets-logo.png" alt="Eastern Sweets" className="h-9 w-9 object-contain" />
             </div>
             {sidebarOpen && (
               <div className="min-w-0">
-                <div className="whitespace-nowrap font-serif text-lg font-semibold tracking-wide text-[#0f615d]">Darbar Sweets</div>
+                <div className="whitespace-nowrap font-serif text-lg font-semibold tracking-wide text-[#0f615d]">Eastern Sweets</div>
                 <div className="mt-1 inline-flex rounded-full bg-[#f1e3cb] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-[#c88421]">
                   {user ? ROLE_LABELS[user.role] : 'System'}
                 </div>
@@ -124,8 +126,8 @@ export function Layout() {
       <div className={sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'}>
         <header className="erp-header sticky top-0 z-20 flex h-16 items-center justify-between border-b border-[#e4d2b6]/80 bg-[#fffaf0]/88 px-4 backdrop-blur-xl lg:px-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c88421]">Sukkur, Sindh</p>
-            <h1 className="font-serif text-lg font-semibold tracking-wide text-[#0f615d]">Darbar Sweets</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c88421]">Bakers &amp; Nimco · Since 1969</p>
+            <h1 className="font-serif text-lg font-semibold tracking-wide text-[#0f615d]">Eastern Sweets</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden rounded-xl border border-[#ead8bb] bg-white/70 px-3 py-2 text-right text-sm shadow-sm sm:block">

@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-function bootstrapPassword(key: string) { const value = process.env[key]; if (!value || value.length < 16) throw new Error('Missing strong bootstrap password: ' + key); return value; }
+function bootstrapPassword(key: string) { const value = process.env[key]; if (!value || value.length < 8) throw new Error('Missing bootstrap password (minimum 8 characters): ' + key); return value; }
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
@@ -13,33 +13,33 @@ const CASHIER_ROLE = 'CASHIER' as any;
 async function main() {
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@darbarsweets.com' },
+    where: { email: 'admin@easternsweets.com' },
     update: { role: ADMIN_ROLE, isActive: true },
     create: {
       name: 'Admin',
-      email: 'admin@darbarsweets.com',
+      email: 'admin@easternsweets.com',
       password: await bcrypt.hash(bootstrapPassword('SEED_ADMIN_PASSWORD'), 12),
       role: ADMIN_ROLE
     }
   });
 
   await prisma.user.upsert({
-    where: { email: 'cashier@darbarsweets.com' },
+    where: { email: 'cashier@easternsweets.com' },
     update: { role: CASHIER_ROLE, isActive: true },
     create: {
       name: 'Ahmed Cashier',
-      email: 'cashier@darbarsweets.com',
+      email: 'cashier@easternsweets.com',
       password: await bcrypt.hash(bootstrapPassword('SEED_CASHIER_PASSWORD'), 12),
       role: CASHIER_ROLE
     }
   });
 
   await prisma.user.upsert({
-    where: { email: 'production@darbarsweets.com' },
+    where: { email: 'production@easternsweets.com' },
     update: { role: PRODUCTION_MANAGER_ROLE, isActive: true },
     create: {
       name: 'Production Manager',
-      email: 'production@darbarsweets.com',
+      email: 'production@easternsweets.com',
       password: await bcrypt.hash(bootstrapPassword('SEED_PRODUCTION_PASSWORD'), 12),
       role: PRODUCTION_MANAGER_ROLE
     }
@@ -48,24 +48,28 @@ async function main() {
   await prisma.shopSettings.upsert({
     where: { id: 'settings-1' },
     update: {
-      shopName: 'Darbar Sweets',
-      address: 'Liquat Chowk, Sukkur, Sindh',
-      phone: '0317-3258390',
-      city: 'Sukkur, Sindh',
+      shopName: 'Eastern Sweets',
+      address: 'Eastern Sweets, Bakers & Nimco',
+      city: 'Pakistan',
       currency: 'PKR',
       taxRate: 0
     },
     create: {
       id: 'settings-1',
-      shopName: 'Darbar Sweets',
-      address: 'Liquat Chowk, Sukkur, Sindh',
-      phone: '0317-3258390',
-      city: 'Sukkur, Sindh',
+      shopName: 'Eastern Sweets',
+      address: 'Eastern Sweets, Bakers & Nimco',
+      city: 'Pakistan',
       currency: 'PKR',
       taxRate: 0
     }
   });
 
+  await prisma.kitchenConsumption.deleteMany({});
+  await prisma.kitchenProductionRun.deleteMany({});
+  await prisma.kitchenAdjustment.deleteMany({});
+  await prisma.kitchenTransfer.deleteMany({});
+  await prisma.packagingTypeCategory.deleteMany({});
+  await prisma.packagingType.deleteMany({});
   await prisma.stockMovement.deleteMany({});
   await prisma.auditLog.deleteMany({});
   await prisma.journalLine.deleteMany({});
@@ -98,6 +102,7 @@ async function main() {
     { code: '1002', name: 'Bank Account', type: 'ASSET', subType: 'BANK' },
     { code: '1100', name: 'Inventory - Raw Materials', type: 'ASSET', subType: 'INVENTORY' },
     { code: '1101', name: 'Inventory - Finished Goods', type: 'ASSET', subType: 'INVENTORY' },
+    { code: '1102', name: 'Kitchen / WIP Inventory', type: 'ASSET', subType: 'INVENTORY' },
     { code: '1200', name: 'Employee Advances', type: 'ASSET', subType: 'RECEIVABLE' },
     { code: '1201', name: 'Supplier Advances', type: 'ASSET', subType: 'RECEIVABLE' },
     { code: '1300', name: 'Accounts Receivable', type: 'ASSET', subType: 'RECEIVABLE' },
@@ -139,8 +144,8 @@ async function main() {
   });
 
   const products = [
-    { name: 'Gulab Jamun', categoryId: desiSweets.id, unit: 'PIECE', sellingPrice: 25, costPrice: 12, currentStock: 100, minStockLevel: 20, skuCode: 'DS-SWT-GJ-001', barcode: '896400100001' },
-    { name: 'Barfi (Plain)', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 800, costPrice: 450, currentStock: 10, minStockLevel: 3, skuCode: 'DS-SWT-BF-001', barcode: '896400100002' },
+    { name: 'Gulab Jamun', categoryId: desiSweets.id, unit: 'PIECE', sellingPrice: 25, costPrice: 12, currentStock: 100, minStockLevel: 20, skuCode: 'ES-SWT-GJ-001', barcode: '896400100001' },
+    { name: 'Barfi (Plain)', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 800, costPrice: 450, currentStock: 10, minStockLevel: 3, skuCode: 'ES-SWT-BF-001', barcode: '896400100002' },
     { name: 'Barfi (Pista)', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 1200, costPrice: 700, currentStock: 8, minStockLevel: 2 },
     { name: 'Jalebi', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 400, costPrice: 200, currentStock: 5, minStockLevel: 2 },
     { name: 'Ladoo (Motichoor)', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 700, costPrice: 380, currentStock: 8, minStockLevel: 3 },
@@ -149,7 +154,7 @@ async function main() {
     { name: 'Kheer', categoryId: desiSweets.id, unit: 'KG', sellingPrice: 600, costPrice: 300, currentStock: 4, minStockLevel: 2 },
     { name: 'Kalakand', categoryId: modernSweets.id, unit: 'KG', sellingPrice: 900, costPrice: 500, currentStock: 5, minStockLevel: 2 },
     { name: 'Ras Malai', categoryId: modernSweets.id, unit: 'PIECE', sellingPrice: 50, costPrice: 25, currentStock: 40, minStockLevel: 10 },
-    { name: 'Samosa (Veg)', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 30, costPrice: 15, currentStock: 60, minStockLevel: 20, skuCode: 'DS-BKY-SM-001', barcode: '896400100003' },
+    { name: 'Samosa (Veg)', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 30, costPrice: 15, currentStock: 60, minStockLevel: 20, skuCode: 'ES-BKY-SM-001', barcode: '896400100003' },
     { name: 'Samosa (Aloo)', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 35, costPrice: 18, currentStock: 60, minStockLevel: 20 },
     { name: 'Patties', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 50, costPrice: 25, currentStock: 40, minStockLevel: 15 },
     { name: 'Bread Loaf', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 120, costPrice: 70, currentStock: 20, minStockLevel: 10 },
@@ -159,6 +164,10 @@ async function main() {
     { name: 'Naan Khatai', categoryId: bakery.id, unit: 'PIECE', sellingPrice: 20, costPrice: 10, currentStock: 100, minStockLevel: 30 },
     { name: 'Biscuit Box', categoryId: bakery.id, unit: 'BOX', sellingPrice: 250, costPrice: 150, currentStock: 30, minStockLevel: 10 }
   ] satisfies Prisma.ProductCreateManyInput[];
+
+  for (const product of products) {
+    if (product.unit === 'KG') Object.assign(product, { saleMode: 'WEIGHT', quantityPresets: JSON.stringify([250, 500, 750, 1000, 1500, 2000]) });
+  }
 
   await prisma.product.createMany({ data: products });
 
@@ -221,7 +230,7 @@ async function main() {
       name: 'Gulab Jamun - 1kg batch',
       yieldQuantity: 40,
       yieldUnit: 'PIECE',
-      notes: 'Standard Darbar mithai kitchen batch',
+      notes: 'Standard Eastern mithai kitchen batch',
       ingredients: {
         create: [
           { rawMaterialId: materialByName('Sugar (Cheeni)').id, quantity: 1.2, unit: 'KG' },

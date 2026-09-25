@@ -2,7 +2,7 @@ import prisma from '../utils/prisma';
 
 type TxClient = any;
 
-const SYSTEM_EMAIL = 'admin@darbarsweets.com';
+const SYSTEM_EMAIL = 'admin@easternsweets.com';
 
 const expenseAccountByCategory: Record<string, string> = {
   rent: '4003',
@@ -21,6 +21,7 @@ const defaultAccountsByCode: Record<string, { name: string; type: string; subTyp
   '1002': { name: 'Bank Account', type: 'ASSET', subType: 'BANK' },
   '1100': { name: 'Inventory - Raw Materials', type: 'ASSET', subType: 'INVENTORY' },
   '1101': { name: 'Inventory - Finished Goods', type: 'ASSET', subType: 'INVENTORY' },
+  '1102': { name: 'Kitchen / WIP Inventory', type: 'ASSET', subType: 'INVENTORY' },
   '1200': { name: 'Employee Advances', type: 'ASSET', subType: 'RECEIVABLE' },
   '1201': { name: 'Supplier Advances', type: 'ASSET', subType: 'RECEIVABLE' },
   '1300': { name: 'Accounts Receivable', type: 'ASSET', subType: 'RECEIVABLE' },
@@ -236,6 +237,22 @@ export const createProductionEntry = (productionId: string, rawMaterialCost: num
     lines.push({ code: '5002', credit: overheadCost, description: 'Production overhead capitalized' });
   }
   return createEntry(tx, 'PRODUCTION', productionId, `Production completed ${productionId}`, lines);
+};
+
+export const createKitchenTransferEntry = (transferId: string, amount: number, createdBy: string, tx: TxClient) => {
+  if (amount <= 0) return Promise.resolve(null);
+  return createEntry(tx, 'KITCHEN_TRANSFER', transferId, `Inventory transferred to kitchen ${transferId}`, [
+    { code: '1102', debit: amount, description: 'Kitchen / WIP inventory received' },
+    { code: '1100', credit: amount, description: 'Raw material inventory transferred' }
+  ], createdBy);
+};
+
+export const createKitchenConsumptionEntry = (runId: string, amount: number, createdBy: string, tx: TxClient) => {
+  if (amount <= 0) return Promise.resolve(null);
+  return createEntry(tx, 'KITCHEN_PRODUCTION', runId, `Kitchen production run ${runId}`, [
+    { code: '1101', debit: amount, description: 'Finished goods production cost' },
+    { code: '1102', credit: amount, description: 'Kitchen materials consumed' }
+  ], createdBy);
 };
 
 export const createSalesReturnEntry = (saleId: string, amount: number, tx: TxClient) =>

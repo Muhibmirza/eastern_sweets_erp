@@ -32,7 +32,7 @@ function check(actual,expected,label){assert.equal(actual,expected,label);count+
  require('../server/dist/index');
  await new Promise(r=>setTimeout(r,500));
  const tokens={};const users={};
- for(const [role,email,key] of [['ADMIN','admin@darbarsweets.com','SEED_ADMIN_PASSWORD'],['CASHIER','cashier@darbarsweets.com','SEED_CASHIER_PASSWORD'],['PRODUCTION_MANAGER','production@darbarsweets.com','SEED_PRODUCTION_PASSWORD']]) {
+ for(const [role,email,key] of [['ADMIN','admin@easternsweets.com','SEED_ADMIN_PASSWORD'],['CASHIER','cashier@easternsweets.com','SEED_CASHIER_PASSWORD'],['PRODUCTION_MANAGER','production@easternsweets.com','SEED_PRODUCTION_PASSWORD']]) {
   const result=await request('/auth/login',opts(null,'POST',{email,password:process.env[key]}));check(result.response.status,200,`${role} login`);
   check('password' in result.body.data.user,false,'No password response');tokens[role]=result.body.data.accessToken;users[role]=result.body.data.user;
   const payload=jwt.verify(tokens[role],process.env.JWT_SECRET);check(payload.exp-payload.iat,900,'Access lifetime');
@@ -67,7 +67,7 @@ function check(actual,expected,label){assert.equal(actual,expected,label);count+
  // Exercise parameterized SQLite backup and merge on disposable data, including a quoted filename.
  const copy=path.join(temp,"backup'quoted.db");await prisma.$executeRaw`VACUUM INTO ${copy}`;check(fs.existsSync(copy),true,'Parameterized vacuum');
  const merged=await require('../server/dist/services/backupService').mergeFullDatabaseBackups([copy]);check(merged.mergedFiles,1,'Parameterized merge');
- for(let i=0;i<10;i++) {const r=await request('/auth/login',opts(null,'POST',{email:'admin@darbarsweets.com',password:randomBytes(12).toString('hex')}));if(i===9)check(r.response.status,429,'Auth rate limit');}
+ for(let i=0;i<10;i++) {const r=await request('/auth/login',opts(null,'POST',{email:'admin@easternsweets.com',password:randomBytes(12).toString('hex')}));if(i===9)check(r.response.status,429,'Auth rate limit');}
  for(let i=0;i<205;i++){const r=await request('/health');if(i===204)check(r.response.status,429,'API rate limit');}
  console.log(`PASS: ${count} security assertions; disposable database only.`);
  await prisma.$disconnect();process.exit(0);

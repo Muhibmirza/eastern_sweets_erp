@@ -2,8 +2,8 @@ import { bootstrapPassword } from '../config/environment';
 import bcrypt from 'bcryptjs';
 import prisma from '../utils/prisma';
 
-const SHOP_ADDRESS = 'Liquat Chowk, Sukkur, Sindh';
-const SHOP_PHONE = '0317-3258390';
+const SHOP_ADDRESS = 'Eastern Sweets, Bakers & Nimco';
+const SHOP_PHONE = '';
 
 export const defaultCategories = [
   { name: 'Sweets', type: 'SWEET', description: 'Mithai and sweet items' },
@@ -17,10 +17,10 @@ export async function ensureDefaultData() {
     await prisma.shopSettings.create({
       data: {
         id: 'settings-1',
-        shopName: 'Darbar Sweets',
+        shopName: 'Eastern Sweets',
         address: SHOP_ADDRESS,
         phone: SHOP_PHONE,
-        city: 'Sukkur, Sindh',
+        city: 'Pakistan',
         currency: 'PKR',
         taxRate: 0
       }
@@ -45,6 +45,7 @@ export async function ensureDefaultData() {
     ['1002', 'Bank Account', 'ASSET', 'BANK'],
     ['1100', 'Inventory - Raw Materials', 'ASSET', 'INVENTORY'],
     ['1101', 'Inventory - Finished Goods', 'ASSET', 'INVENTORY'],
+    ['1102', 'Kitchen / WIP Inventory', 'ASSET', 'INVENTORY'],
     ['1200', 'Employee Advances', 'ASSET', 'RECEIVABLE'],
     ['1201', 'Supplier Advances', 'ASSET', 'RECEIVABLE'],
     ['1300', 'Accounts Receivable', 'ASSET', 'RECEIVABLE'],
@@ -86,13 +87,13 @@ export async function ensureDefaultData() {
   const productionPassword = await bcrypt.hash(bootstrapPassword('SEED_PRODUCTION_PASSWORD'), 12);
 
   const admin = await prisma.user.create({
-    data: { name: 'Admin', email: 'admin@darbarsweets.com', password: adminPassword, role: 'ADMIN', isActive: true }
+    data: { name: 'Admin', email: 'admin@easternsweets.com', password: adminPassword, role: 'ADMIN', isActive: true }
   });
   await prisma.user.create({
-    data: { name: 'Ahmed Cashier', email: 'cashier@darbarsweets.com', password: cashierPassword, role: 'CASHIER', isActive: true }
+    data: { name: 'Ahmed Cashier', email: 'cashier@easternsweets.com', password: cashierPassword, role: 'CASHIER', isActive: true }
   });
   await prisma.user.create({
-    data: { name: 'Production Manager', email: 'production@darbarsweets.com', password: productionPassword, role: 'PRODUCTION_MANAGER', isActive: true }
+    data: { name: 'Production Manager', email: 'production@easternsweets.com', password: productionPassword, role: 'PRODUCTION_MANAGER', isActive: true }
   });
 
   await prisma.auditLog.create({

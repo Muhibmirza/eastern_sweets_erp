@@ -2,6 +2,11 @@ import { publicError } from '../utils/publicError';
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 
+const normalizeProduct = (product: any) => ({
+  ...product,
+  quantityPresets: product.quantityPresets ? (() => { try { return JSON.parse(product.quantityPresets); } catch { return []; } })() : null
+});
+
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const { search, categoryId, isActive, page = '1', limit = '20' } = req.query;
@@ -26,7 +31,7 @@ export const getProducts = async (req: Request, res: Response) => {
       prisma.product.count({ where })
     ]);
 
-    res.json({ success: true, data: products, meta: { total, page: parseInt(page as string), limit: parseInt(limit as string) } });
+    res.json({ success: true, data: products.map(normalizeProduct), meta: { total, page: parseInt(page as string), limit: parseInt(limit as string) } });
   } catch {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -39,7 +44,7 @@ export const getProduct = async (req: Request, res: Response) => {
       include: { category: true, stockMovements: { take: 20, orderBy: { createdAt: 'desc' }, include: { user: { select: { name: true } } } } }
     });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-    res.json({ success: true, data: product });
+    res.json({ success: true, data: normalizeProduct(product) });
   } catch {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -47,15 +52,15 @@ export const getProduct = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { name, categoryId, unit, sellingPrice, costPrice, currentCost, currentStock, minStockLevel, description, skuCode, barcode } = req.body;
+    const { name, categoryId, unit, sellingPrice, costPrice, currentCost, currentStock, minStockLevel, description, skuCode, barcode, saleMode = 'UNIT', quantityPresets } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const initialCost = Number(currentCost || costPrice || 0);
     const product = await prisma.product.create({
-      data: { name, categoryId, unit, sellingPrice: parseFloat(sellingPrice), costPrice: initialCost, currentCost: initialCost, currentStock: parseFloat(currentStock || '0'), minStockLevel: parseFloat(minStockLevel || '5'), description, imageUrl, skuCode: skuCode || null, barcode: barcode || null },
+      data: { name, categoryId, unit, sellingPrice: parseFloat(sellingPrice), costPrice: initialCost, currentCost: initialCost, currentStock: parseFloat(currentStock || '0'), minStockLevel: parseFloat(minStockLevel || '5'), description, imageUrl, skuCode: skuCode || null, barcode: barcode || null, saleMode: saleMode === 'WEIGHT' ? 'WEIGHT' : 'UNIT', quantityPresets: saleMode === 'WEIGHT' ? JSON.stringify(Array.isArray(quantityPresets) ? quantityPresets.map(Number).filter((x: number) => x > 0) : [250, 500, 750, 1000]) : null },
       include: { category: true }
     });
-    res.status(201).json({ success: true, data: product });
+    res.status(201).json({ success: true, data: normalizeProduct(product) });
   } catch (error: any) {
     res.status(500).json({ success: false, message: publicError(error, 'Something went wrong. Please try again.') });
   }
@@ -63,7 +68,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { name, categoryId, unit, sellingPrice, costPrice, currentCost, minStockLevel, description, isActive, skuCode, barcode } = req.body;
+    const { name, categoryId, unit, sellingPrice, costPrice, currentCost, minStockLevel, description, isActive, skuCode, barcode, saleMode, quantityPresets } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
 
     const updateData: any = {
@@ -84,11 +89,13 @@ export const updateProduct = async (req: Request, res: Response) => {
       updateData.costPrice = parseFloat(costPrice);
     }
     if (imageUrl) updateData.imageUrl = imageUrl;
+    if (saleMode !== undefined) updateData.saleMode = saleMode === 'WEIGHT' ? 'WEIGHT' : 'UNIT';
+    if (quantityPresets !== undefined) updateData.quantityPresets = JSON.stringify(Array.isArray(quantityPresets) ? quantityPresets.map(Number).filter((x: number) => x > 0) : []);
 
     const product = await prisma.product.update({
       where: { id: req.params.id }, data: updateData, include: { category: true }
     });
-    res.json({ success: true, data: product });
+    res.json({ success: true, data: normalizeProduct(product) });
   } catch {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -101,7 +108,7 @@ export const getProductByBarcode = async (req: Request, res: Response) => {
       include: { category: true }
     });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-    res.json({ success: true, data: product });
+    res.json({ success: true, data: normalizeProduct(product) });
   } catch {
     res.status(500).json({ success: false, message: 'Server error' });
   }

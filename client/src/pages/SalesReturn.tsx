@@ -43,7 +43,7 @@ export default function SalesReturn() {
       <div className="erp-card grid gap-3 p-5 md:grid-cols-[1fr_auto]">
         <label className="grid gap-1">
           <span className="text-sm font-semibold">Enter Invoice No to return against</span>
-          <input className="erp-input" placeholder="DS-20260620-1047" value={invoiceNo} onChange={(e) => setInvoiceNo(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') setLookupInvoice(invoiceNo.trim()); }} />
+          <input className="erp-input" placeholder="ES-20260620-1047" value={invoiceNo} onChange={(e) => setInvoiceNo(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') setLookupInvoice(invoiceNo.trim()); }} />
         </label>
         <button className="btn-primary self-end" onClick={() => setLookupInvoice(invoiceNo.trim())} disabled={!invoiceNo.trim()}>Find Invoice</button>
       </div>

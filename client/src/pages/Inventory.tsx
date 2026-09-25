@@ -15,6 +15,8 @@ import { canEditDelete } from '../utils/permissions';
 import { ALL_UNITS } from '../constants/units';
 
 const datetimeLocalNow = () => new Date().toISOString().slice(0, 16);
+const WEIGHT_PRESETS = [250, 500, 750, 1000, 1500, 2000];
+const presetLabel = (grams: number) => grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`;
 
 export default function Inventory() {
   const queryClient = useQueryClient();
@@ -26,7 +28,9 @@ export default function Inventory() {
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const { register, handleSubmit, reset } = useForm({ defaultValues: { name: '', categoryId: '', unit: 'KG', sellingPrice: '', currentStock: '', minStockLevel: '' } });
+  const { register, handleSubmit, reset, watch } = useForm({ defaultValues: { name: '', categoryId: '', unit: 'PIECE', sellingPrice: '', currentStock: '', minStockLevel: '', saleMode: 'UNIT' } });
+  const [createPresets, setCreatePresets] = useState<number[]>([250, 500, 750, 1000]);
+  const createSaleMode = watch('saleMode');
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
     return () => window.clearTimeout(timer);
@@ -44,6 +48,7 @@ export default function Inventory() {
     onSuccess: () => {
       toast('Product saved');
       reset();
+      setCreatePresets([250, 500, 750, 1000]);
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError: () => toast('Could not save product', 'error')
@@ -112,7 +117,7 @@ export default function Inventory() {
           </div>
         )}
       </section>
-      <form onSubmit={handleSubmit((data) => createProduct.mutate(data))} className="rounded-lg border bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+      <form onSubmit={handleSubmit((data) => createProduct.mutate({ ...data, quantityPresets: createSaleMode === 'WEIGHT' ? createPresets : [] }))} className="rounded-lg border bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
         <h2 className="mb-3 font-semibold">Add Product</h2>
         <div className="grid gap-3">
           <input className="touch rounded-md border bg-transparent px-3 dark:border-slate-700" placeholder="Product name" {...register('name', { required: true })} />
@@ -121,6 +126,11 @@ export default function Inventory() {
             {categories.data?.filter((c) => c.type !== 'RAW_MATERIAL').map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
           </select>
           <select className="touch rounded-md border bg-transparent px-3 dark:border-slate-700" {...register('unit')}>{ALL_UNITS.map((unit) => <option key={unit.value} value={unit.value}>{unit.label}</option>)}</select>
+          <fieldset className="rounded-md border p-3 dark:border-slate-700">
+            <legend className="px-1 text-sm font-semibold">Sale Mode</legend>
+            <div className="flex gap-4 text-sm"><label className="flex items-center gap-2"><input type="radio" value="WEIGHT" {...register('saleMode')} />By Weight (kg/g)</label><label className="flex items-center gap-2"><input type="radio" value="UNIT" {...register('saleMode')} />By Piece/Unit</label></div>
+          </fieldset>
+          {createSaleMode === 'WEIGHT' && <fieldset className="rounded-md border p-3 dark:border-slate-700"><legend className="px-1 text-sm font-semibold">Quantity Presets</legend><div className="grid grid-cols-3 gap-2 text-sm">{WEIGHT_PRESETS.map((grams) => <label key={grams} className="flex items-center gap-2"><input type="checkbox" checked={createPresets.includes(grams)} onChange={() => setCreatePresets((current) => current.includes(grams) ? current.filter((x) => x !== grams) : [...current, grams].sort((a, b) => a - b))} />{presetLabel(grams)}</label>)}</div></fieldset>}
           <input className="touch rounded-md border bg-transparent px-3 dark:border-slate-700" type="number" step="0.001" min="0" placeholder="Selling price" {...register('sellingPrice', { required: true })} />
           <input className="touch rounded-md border bg-transparent px-3 dark:border-slate-700" type="number" step="0.001" min="0" placeholder="Opening stock" {...register('currentStock')} />
           <input className="touch rounded-md border bg-transparent px-3 dark:border-slate-700" type="number" step="0.001" min="0" placeholder="Minimum stock level" {...register('minStockLevel')} />
@@ -187,7 +197,8 @@ export default function Inventory() {
 }
 
 function ProductEditForm({ product, categories, onCancel, onSave, isSaving }: { product: Product; categories: Category[]; onCancel: () => void; onSave: (data: any) => void; isSaving: boolean }) {
-  const { register, handleSubmit } = useForm({
+  const [presets, setPresets] = useState<number[]>(product.quantityPresets || [250, 500, 750, 1000]);
+  const { register, handleSubmit, watch } = useForm({
     values: {
       name: product.name,
       categoryId: product.categoryId,
@@ -197,10 +208,12 @@ function ProductEditForm({ product, categories, onCancel, onSave, isSaving }: { 
       currentCost: product.currentCost || product.costPrice || 0,
       description: product.description || '',
       isActive: product.isActive
+      ,saleMode: product.saleMode || 'UNIT'
     }
   });
+  const saleMode = watch('saleMode');
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit(onSave)}>
+    <form className="grid gap-4" onSubmit={handleSubmit((data) => onSave({ ...data, quantityPresets: saleMode === 'WEIGHT' ? presets : [] }))}>
       <label><span className="mb-1 block text-sm font-semibold">Name *</span><input className="erp-input" {...register('name', { required: true })} /></label>
       <div className="grid gap-4 md:grid-cols-2">
         <label><span className="mb-1 block text-sm font-semibold">Category *</span><select className="erp-input" {...register('categoryId', { required: true })}>{categories.filter((c) => c.type !== 'RAW_MATERIAL').map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}</select></label>
@@ -213,6 +226,8 @@ function ProductEditForm({ product, categories, onCancel, onSave, isSaving }: { 
         </label>
         <label><span className="mb-1 block text-sm font-semibold">Min Stock</span><input className="erp-input" type="number" {...register('minStockLevel', { valueAsNumber: true })} /></label>
       </div>
+      <fieldset className="rounded-md border p-3 dark:border-slate-700"><legend className="px-1 text-sm font-semibold">Sale Mode</legend><div className="flex gap-4 text-sm"><label className="flex items-center gap-2"><input type="radio" value="WEIGHT" {...register('saleMode')} />By Weight (kg/g)</label><label className="flex items-center gap-2"><input type="radio" value="UNIT" {...register('saleMode')} />By Piece/Unit</label></div></fieldset>
+      {saleMode === 'WEIGHT' && <fieldset className="rounded-md border p-3 dark:border-slate-700"><legend className="px-1 text-sm font-semibold">Quantity Presets</legend><div className="grid grid-cols-3 gap-2 text-sm">{WEIGHT_PRESETS.map((grams) => <label key={grams} className="flex items-center gap-2"><input type="checkbox" checked={presets.includes(grams)} onChange={() => setPresets((current) => current.includes(grams) ? current.filter((x) => x !== grams) : [...current, grams].sort((a, b) => a - b))} />{presetLabel(grams)}</label>)}</div></fieldset>}
       <label><span className="mb-1 block text-sm font-semibold">Description</span><textarea className="erp-input" {...register('description')} /></label>
       <div className="flex justify-end gap-3"><button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button><button className="btn-primary" disabled={isSaving}>{isSaving ? 'Saving...' : 'Save'}</button></div>
     </form>

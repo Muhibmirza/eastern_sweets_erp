@@ -3,11 +3,12 @@ import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import dayjs from 'dayjs';
 import { createSaleEntry, createSalesReturnEntry } from '../services/journalService';
+import { calculatePackagingCharge } from '../utils/packaging';
 
 const generateInvoiceNo = () => {
   const date = dayjs().format('YYYYMMDD');
   const random = Math.floor(Math.random() * 9000) + 1000;
-  return `DS-${date}-${random}`;
+  return `ES-${date}-${random}`;
 };
 
 const generateReturnNo = () => {
@@ -37,7 +38,7 @@ export const getSales = async (req: Request, res: Response) => {
     const [sales, total] = await Promise.all([
       prisma.sale.findMany({
         where, skip, take: parseInt(limit as string),
-        include: { customer: true, cashier: { select: { name: true } }, items: { include: { product: true } } },
+        include: { customer: true, cashier: { select: { name: true } }, items: { include: { product: true, packagingType: true } } },
         orderBy: { createdAt: 'desc' }
       }),
       prisma.sale.count({ where })
@@ -53,7 +54,7 @@ export const getSale = async (req: Request, res: Response) => {
   try {
     const sale = await prisma.sale.findUnique({
       where: { id: req.params.id },
-      include: { customer: true, cashier: { select: { name: true, email: true } }, items: { include: { product: { include: { category: true } } } } }
+      include: { customer: true, cashier: { select: { name: true, email: true } }, items: { include: { product: { include: { category: true } }, packagingType: true } } }
     });
     if (!sale) return res.status(404).json({ success: false, message: 'Sale not found' });
     if (!sale.tokenNumber) {
@@ -76,7 +77,7 @@ export const getSaleByInvoice = async (req: Request, res: Response) => {
       include: {
         customer: true,
         cashier: { select: { name: true, email: true } },
-        items: { include: { product: { include: { category: true } }, returns: true } }
+        items: { include: { product: { include: { category: true } }, packagingType: true, returns: true } }
       }
     });
     if (!sale) return res.status(404).json({ success: false, message: 'Sale not found' });
@@ -404,8 +405,17 @@ export const createSale = async (req: any, res: Response) => {
       const unitPrice = Number(item.unitPrice || product.sellingPrice);
       const costPrice = product.currentCost || product.costPrice || 0;
       const subtotal = unitPrice * quantity;
-      const profit = (unitPrice - costPrice) * quantity;
-      totalAmount += subtotal;
+      let packagingType: any = null;
+      let packagingCharge = 0;
+      if (item.packagingTypeId) {
+        packagingType = await prisma.packagingType.findFirst({
+          where: { id: String(item.packagingTypeId), isActive: true, categories: { some: { categoryId: product.categoryId } } }
+        });
+        if (!packagingType) return res.status(400).json({ success: false, message: `Invalid packaging selection for ${product.name}` });
+        packagingCharge = Math.round(calculatePackagingCharge(packagingType, quantity, subtotal));
+      }
+      const profit = (unitPrice - costPrice) * quantity + packagingCharge;
+      totalAmount += subtotal + packagingCharge;
       totalCogs += costPrice * quantity;
       saleItems.push({
         productId: item.productId,
@@ -415,7 +425,9 @@ export const createSale = async (req: any, res: Response) => {
         unitPrice,
         subtotal,
         costPrice,
-        profit
+        profit,
+        packagingTypeId: packagingType?.id || null,
+        packagingCharge
       });
     }
 
@@ -466,7 +478,7 @@ export const createSale = async (req: any, res: Response) => {
           cashierId: req.user.id,
           items: { create: saleItems }
         },
-        include: { customer: true, cashier: { select: { name: true } }, items: { include: { product: true } } }
+        include: { customer: true, cashier: { select: { name: true } }, items: { include: { product: true, packagingType: true } } }
       });
 
       // Deduct stock

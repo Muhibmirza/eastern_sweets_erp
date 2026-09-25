@@ -1,6 +1,6 @@
-# Darbar Sweets ERP Deployment
+# Eastern Sweets ERP Deployment
 
-Darbar Sweets ERP runs as a normal Windows desktop app. The main computer launches `Darbar Sweets ERP.exe`, starts the bundled backend server, opens the ERP in a native Electron window, and stores shop data in a writable Windows app-data database.
+Eastern Sweets ERP runs as a normal Windows desktop app. The main computer launches `Eastern Sweets ERP.exe`, starts the bundled backend server, opens the ERP in a native Electron window, and stores shop data in a writable Windows app-data database.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ The ERP database is separate from the installed app files.
 - Database lives in:
 
 ```text
-%APPDATA%\darbar-sweets-erp\runtime\server\data\darbar-sweets.db
+%APPDATA%\eastern-sweets-erp\runtime\server\data\eastern-sweets.db
 ```
 
 Updating the app replaces program files only. Sales, products, stock, recipes, accounting, users, and settings remain untouched in the app-data database.
@@ -41,13 +41,13 @@ The script builds:
 
 Installer:
 
-1. Run `desktop\release\Darbar Sweets ERP Setup 1.0.0.exe`.
+1. Run `desktop\release\Eastern Sweets ERP Setup 1.0.0.exe`.
 2. Launch from the desktop shortcut.
 
 Portable:
 
 1. Copy `desktop\release\win-unpacked`.
-2. Run `Darbar Sweets ERP.exe`.
+2. Run `Eastern Sweets ERP.exe`.
 3. No extra services are required.
 
 On first launch the app creates its database in `%APPDATA%`, starts the backend on port `5000`, and opens the ERP in a native desktop window.
@@ -70,10 +70,10 @@ Separate installs on separate laptops have separate databases. For one shared sh
 The release includes:
 
 ```text
-Darbar Sweets - Backup Tool.exe
+Eastern Sweets - Backup Tool.exe
 ```
 
-Keep it in the same live folder as `Darbar Sweets ERP.exe`. It reads the same app-data database, supports manual backup, auto backup scheduling, and grouped backup sizes for Admin, Production Manager, and Cashier data.
+Keep it in the same live folder as `Eastern Sweets ERP.exe`. It reads the same app-data database, supports manual backup, auto backup scheduling, and grouped backup sizes for Admin, Production Manager, and Cashier data.
 
 ## Auto Updates
 
@@ -84,7 +84,7 @@ Current publish mode is generic static hosting:
 ```json
 {
   "provider": "generic",
-  "url": "https://updates.darbarsweets.com/erp/"
+  "url": "https://updates.easternsweets.com/erp/"
 }
 ```
 
@@ -99,7 +99,7 @@ scripts\build-release.bat
 ```
 
 4. Upload these generated files to the update server URL:
-   - `desktop\release\Darbar Sweets ERP Setup <version>.exe`
+   - `desktop\release\Eastern Sweets ERP Setup <version>.exe`
    - `desktop\release\latest.yml`
    - any `.blockmap` file generated beside the installer
 5. Client apps check on launch and every 4 hours.
@@ -115,7 +115,7 @@ In `desktop/package.json`, replace the generic `publish` config with:
 {
   "provider": "github",
   "owner": "your-github-username",
-  "repo": "darbar-sweets-erp",
+  "repo": "eastern-sweets-erp",
   "private": false
 }
 ```

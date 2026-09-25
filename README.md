@@ -1,8 +1,8 @@
-# Sweets Shop ERP
+# eastern_sweets_erp
 
 A complete point-of-sale, inventory, production, accounting, supplier, customer, and workforce management system for sweets shops, bakeries, confectioneries, dessert businesses, and other production-based retail stores.
 
-This repository is currently branded and deployed as **Darbar Sweets**, but the underlying system is not limited to one shop. Business details, products, categories, users, pricing, recipes, suppliers, and operational data can be configured for other businesses.
+This repository is currently branded and deployed as **Eastern Sweets**, but the underlying system is not limited to one shop. Business details, products, categories, users, pricing, recipes, suppliers, and operational data can be configured for other businesses.
 
 ## What The System Does
 
@@ -154,7 +154,7 @@ scripts\build-release.bat
 The release process produces:
 
 ```text
-desktop/release/Darbar-Sweets-Setup-<version>.exe
+desktop/release/Eastern-Sweets-Setup-<version>.exe
 desktop/release/win-unpacked/
 desktop/release/latest.yml
 ```
@@ -170,7 +170,7 @@ See [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for installation, LAN access, b
 
 ## Current Deployment
 
-The current packaged build uses the **Darbar Sweets** name, logo, receipt branding, and update endpoint. These are deployment-specific settings; the ERP workflow itself is suitable for other sweets and bakery businesses after configuration and branding changes.
+The current packaged build uses the **Eastern Sweets** name, logo, receipt branding, and update endpoint. These are deployment-specific settings; the ERP workflow itself is suitable for other sweets and bakery businesses after configuration and branding changes.
 
 
 ## Security configuration (v1.6.6)
@@ -179,7 +179,7 @@ Change admin password on first login.
 
 Copy `server/.env.example` to `server/.env` and supply independent random JWT secrets and unique initial user passwords. Generate each JWT secret with `node -e "process.stdout.write(require('crypto').randomBytes(48).toString('hex'))"`. Initial user passwords must have at least 16 characters and at most 72 UTF-8 bytes. The seed and initial desktop bootstrap hash them with bcryptjs (cost 12); existing users are not reset.
 
-The packaged desktop generates installation-specific JWT secrets and initial passwords in `%APPDATA%/Darbar Sweets/runtime/server/.env` (under Electron's userData directory). The operator can read the initial admin password there on a new installation; it is never printed or bundled. Keep that file private. Updates retain it. Existing passwords remain unchanged; the switch away from shared JWT keys requires signing in again.
+The packaged desktop generates installation-specific JWT secrets and initial passwords in `%APPDATA%/Eastern Sweets/runtime/server/.env` (under Electron's userData directory). The operator can read the initial admin password there on a new installation; it is never printed or bundled. Keep that file private. Updates retain it. Existing passwords remain unchanged; the switch away from shared JWT keys requires signing in again.
 
 Local development reads `server/.env`. The optional legacy Docker setup uses `docker compose --env-file server/.env up -d`; its existing database password was moved without changing an existing volume's credentials. Normal desktop operation uses SQLite and requires no Docker installation.
 

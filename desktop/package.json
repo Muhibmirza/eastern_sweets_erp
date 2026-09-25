@@ -1,9 +1,9 @@
 {
-  "name": "darbar-sweets-erp",
-  "version": "1.6.6",
-  "description": "Darbar Sweets - Point of Sale & Management System",
+  "name": "eastern-sweets-erp",
+  "version": "1.0.0",
+  "description": "Eastern Sweets - Point of Sale & Management System",
   "main": "main.js",
-  "author": "Darbar Sweets",
+  "author": "Eastern Sweets",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder"
@@ -17,9 +17,9 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.darbarsweets.erp",
-    "productName": "Darbar Sweets",
-    "artifactName": "Darbar Sweets Setup ${version}.${ext}",
+    "appId": "com.easternsweets.erp",
+    "productName": "Eastern Sweets",
+    "artifactName": "Eastern Sweets Setup ${version}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -58,8 +58,8 @@
     ],
     "extraFiles": [
       {
-        "from": "../backup-tool/release/Darbar Sweets - Backup Tool.exe",
-        "to": "Darbar Sweets - Backup Tool.exe"
+        "from": "../backup-tool/release/Eastern Sweets - Backup Tool.exe",
+        "to": "Eastern Sweets - Backup Tool.exe"
       }
     ],
     "win": {
@@ -71,12 +71,12 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Darbar Sweets"
+      "shortcutName": "Eastern Sweets"
     },
     "publish": [
       {
         "provider": "generic",
-        "url": "https://aaapparels.com/darbar-sweets-erp/"
+        "url": "https://aaapparels.com/eastern-sweets-erp/"
       }
     ]
   }

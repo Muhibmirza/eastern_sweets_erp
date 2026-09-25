@@ -47,19 +47,19 @@ async function main() {
   await prisma.shopSettings.upsert({
     where: { id: 'settings-1' },
     update: {
-      shopName: 'Darbar Sweets',
-      address: 'Liquat Chowk, Sukkur, Sindh',
-      phone: '0317-3258390',
-      city: 'Sukkur, Sindh',
+      shopName: 'Eastern Sweets',
+      address: 'Eastern Sweets, Bakers & Nimco',
+      phone: '',
+      city: 'Pakistan',
       currency: 'PKR',
       taxRate: 0
     },
     create: {
       id: 'settings-1',
-      shopName: 'Darbar Sweets',
-      address: 'Liquat Chowk, Sukkur, Sindh',
-      phone: '0317-3258390',
-      city: 'Sukkur, Sindh',
+      shopName: 'Eastern Sweets',
+      address: 'Eastern Sweets, Bakers & Nimco',
+      phone: '',
+      city: 'Pakistan',
       currency: 'PKR',
       taxRate: 0
     }

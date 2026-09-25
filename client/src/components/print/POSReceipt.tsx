@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
+import { Fragment } from 'react';
 import type { Sale } from '../../types';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { formatQuantity } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -18,7 +19,7 @@ export function POSReceipt({ sale }: POSReceiptProps) {
   return (
     <div style={{ margin: 0, padding: '0 0.25mm', paddingTop: 0, marginTop: 0, width: '70mm', maxWidth: '70mm', fontFamily: '"Courier New", monospace, Arial, sans-serif', fontSize: '8.4pt', color: '#000', fontWeight: 900, overflow: 'hidden' }} className="thermal-print">
       <div style={{ textAlign: 'center', margin: 0, padding: 0 }}>
-        <img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ display: 'block', width: '34mm', maxWidth: '34mm', height: 'auto', maxHeight: '36mm', objectFit: 'contain', margin: '0 auto' }} />
+        <img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ display: 'block', width: '34mm', maxWidth: '34mm', height: 'auto', maxHeight: '36mm', objectFit: 'contain', margin: '0 auto' }} />
       </div>
       {line}
       {sale.tokenNumber && (
@@ -48,12 +49,18 @@ export function POSReceipt({ sale }: POSReceiptProps) {
         </thead>
         <tbody>
           {sale.items.map((item) => (
-            <tr key={`${sale.id}-${item.id || item.productId}`}>
+            <Fragment key={`${sale.id}-${item.id || item.productId}`}>
+            <tr>
               <td style={{ width: '36%', borderBottom: '1px dashed #777', padding: '1px 0', wordBreak: 'break-word', overflowWrap: 'anywhere', verticalAlign: 'top' }}>{item.product?.name || 'Item'}</td>
               <td style={{ width: '17%', borderBottom: '1px dashed #777', padding: '1px 0', textAlign: 'center', wordBreak: 'break-word', verticalAlign: 'top' }}>{formatQuantity(item.displayQuantity || item.quantity, item.displayUnit || item.product?.unit || '')}</td>
               <td style={{ width: '21%', borderBottom: '1px dashed #777', padding: '1px 0', textAlign: 'right', verticalAlign: 'top' }}>{amount(item.unitPrice)}</td>
               <td style={{ width: '26%', borderBottom: '1px dashed #777', padding: '1px 0', textAlign: 'right', verticalAlign: 'top' }}>{amount(item.subtotal)}</td>
             </tr>
+            <tr>
+              <td colSpan={3} style={{ borderBottom: '1px dashed #777', padding: '1px 0 1px 8px', fontSize: '7pt' }}>{item.packagingType?.name || 'No Packaging'}</td>
+              <td style={{ borderBottom: '1px dashed #777', padding: '1px 0', textAlign: 'right', fontSize: '7pt' }}>{amount(item.packagingCharge || 0)}</td>
+            </tr>
+            </Fragment>
           ))}
         </tbody>
       </table>

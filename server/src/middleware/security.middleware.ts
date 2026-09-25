@@ -5,10 +5,10 @@ const numericFields = new Set([
   ...Prisma.dmmf.datamodel.models.flatMap(model => model.fields
     .filter(field => ['Int', 'Float', 'Decimal', 'BigInt'].includes(field.type)).map(field => field.name)),
   'qty', 'actualQty', 'workingDays', 'laborCost', 'packingCost', 'shortTermDeduction', 'longTermDeduction',
-  'recoveredAmount', 'openingBalance', 'advance', 'paid', 'debit', 'credit'
+  'recoveredAmount', 'openingBalance', 'advance', 'paid', 'debit', 'credit', 'kitchenAdjustmentQuantity'
 ]);
 // Balances and closing differences may legitimately be negative.
-const signedFields = new Set(['balance', 'openingBalance', 'closingBalance', 'difference', 'cashDifference', 'profit', 'netProfit']);
+const signedFields = new Set(['balance', 'openingBalance', 'closingBalance', 'difference', 'cashDifference', 'profit', 'netProfit', 'kitchenAdjustmentQuantity']);
 
 export function validateWriteNumbers(req: Request, res: Response, next: NextFunction) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return next();

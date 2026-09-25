@@ -1,4 +1,4 @@
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { pkr } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -8,7 +8,7 @@ export function PayslipPrint({ salary, employeeLoan }: { salary: any; employeeLo
   const totalDeductions = (salary?.advanceDeduction || salary?.advances || 0) + (salary?.loanDeduction || 0) + (salary?.fineDeduction || 0) + (salary?.otherDeductions || salary?.deductions || 0);
   return (
     <div className="thermal-print">
-      <div className="print-center"><img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>SALARY SLIP</h2></div>
+      <div className="print-center"><img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>SALARY SLIP</h2></div>
       <div className="print-line" />
       <div>Employee: {employee.name || '-'}</div>
       <div>CNIC: {employee.cnic || '-'}</div>

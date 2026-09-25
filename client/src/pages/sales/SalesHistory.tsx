@@ -90,7 +90,7 @@ export default function SalesHistory() {
           </label>
           <label className="relative grid flex-1 gap-1 text-sm">
             <span>Invoice No</span>
-            <div className="flex items-center gap-2 rounded-xl border border-[#dac197] bg-white px-3"><Search size={16} /><input className="h-11 flex-1 bg-transparent outline-none" placeholder="DS-..." value={filters.invoiceNo} onChange={(e) => setFilters({ ...filters, invoiceNo: e.target.value })} /></div>
+            <div className="flex items-center gap-2 rounded-xl border border-[#dac197] bg-white px-3"><Search size={16} /><input className="h-11 flex-1 bg-transparent outline-none" placeholder="ES-..." value={filters.invoiceNo} onChange={(e) => setFilters({ ...filters, invoiceNo: e.target.value })} /></div>
             {invoiceSuggestions.data?.length ? (
               <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-auto rounded-xl border border-[#dac197] bg-white shadow-xl">
                 {invoiceSuggestions.data.map((invoice) => (

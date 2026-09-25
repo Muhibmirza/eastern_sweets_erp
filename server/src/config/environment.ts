@@ -24,6 +24,6 @@ export function validateEnvironment() {
 
 export function bootstrapPassword(key: string) {
   const value = process.env[key];
-  if (!value || value.length < 16 || Buffer.byteLength(value) > 72) throw new Error(`FATAL: ${key} must contain at least 16 characters and at most 72 bytes for initial user creation`);
+  if (!value || value.length < 8 || Buffer.byteLength(value) > 72) throw new Error(`FATAL: ${key} must contain at least 8 characters and at most 72 bytes for initial user creation`);
   return value;
 }

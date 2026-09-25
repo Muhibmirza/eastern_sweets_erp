@@ -35,6 +35,8 @@ import productionRoutes from './routes/production.routes';
 import leaveRoutes from './routes/leave.routes';
 import advanceRoutes from './routes/advance.routes';
 import auditRoutes from './routes/audit.routes';
+import packagingTypeRoutes from './routes/packagingType.routes';
+import kitchenRoutes from './routes/kitchen.routes';
 import { initBackupScheduler } from './services/backupScheduler';
 import { ensureDefaultData } from './services/bootstrapService';
 
@@ -94,9 +96,11 @@ app.use('/api/production', productionRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use('/api/advances', advanceRoutes);
 app.use('/api/audit-logs', auditRoutes);
+app.use('/api/packaging-types', packagingTypeRoutes);
+app.use('/api/kitchen', kitchenRoutes);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', message: 'Darbar Sweets API is running' });
+  res.json({ status: 'ok', message: 'Eastern Sweets API is running' });
 });
 
 const frontendDist = path.join(__dirname, '../../client/dist');

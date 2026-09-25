@@ -14,6 +14,7 @@ import { canEditDelete } from '../utils/permissions';
 
 const roleBadgeClasses: Record<Role, string> = {
   ADMIN: 'bg-red-50 text-red-700 border-red-200',
+  MANAGER: 'bg-amber-50 text-amber-700 border-amber-200',
   PRODUCTION_MANAGER: 'bg-blue-50 text-blue-700 border-blue-200',
   CASHIER: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   STAFF: 'bg-slate-50 text-slate-700 border-slate-200'
@@ -44,7 +45,7 @@ export default function Settings() {
   const settings = useQuery({ queryKey: ['settings'], queryFn: () => unwrap<any>(api.get('/api/settings')) });
   const categories = useQuery({ queryKey: ['categories'], queryFn: () => unwrap<Category[]>(api.get('/api/categories')) });
   const users = useQuery({ queryKey: ['settings-users'], queryFn: () => unwrap<User[]>(api.get('/api/settings/users')) });
-  const shopForm = useForm({ values: settings.data || { shopName: 'Darbar Sweets', address: 'Liquat Chowk, Sukkur, Sindh', phone: '0317-3258390', city: 'Sukkur, Sindh', taxRate: 0 } });
+  const shopForm = useForm({ values: settings.data || { shopName: 'Eastern Sweets', address: 'Eastern Sweets, Bakers & Nimco', phone: '', city: 'Pakistan', taxRate: 0 } });
   const categoryForm = useForm({ defaultValues: { name: '', type: 'SWEET', description: '' } });
   const editCategoryForm = useForm({ values: categoryToEdit || { name: '', type: 'SWEET', description: '' } });
 
@@ -261,6 +262,7 @@ export default function Settings() {
                         onChange={(event) => updateUser.mutate({ id: user.id, data: { role: event.target.value as Role } })}
                       >
                         <option value="ADMIN">Admin</option>
+                        <option value="MANAGER">Manager</option>
                         <option value="PRODUCTION_MANAGER">Production Manager</option>
                         <option value="CASHIER">Cashier</option>
                         <option value="STAFF">Staff</option>

@@ -1,4 +1,4 @@
-export type Role = 'ADMIN' | 'PRODUCTION_MANAGER' | 'CASHIER' | 'STAFF';
+export type Role = 'ADMIN' | 'MANAGER' | 'PRODUCTION_MANAGER' | 'CASHIER' | 'STAFF';
 export type Unit = 'KG' | 'GRAM' | 'LITRE' | 'ML' | 'PIECE' | 'BOX' | 'DOZEN' | 'PACK';
 export type PaymentMethod = 'CASH' | 'CARD' | 'JAZZCASH' | 'EASYPAISA';
 export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'READY' | 'DELIVERED' | 'CANCELLED';
@@ -39,6 +39,8 @@ export interface Product {
   imageUrl?: string;
   isActive: boolean;
   description?: string;
+  saleMode: 'WEIGHT' | 'UNIT';
+  quantityPresets?: number[] | null;
 }
 
 export interface Customer {
@@ -65,6 +67,18 @@ export interface SaleItem {
   subtotal: number;
   costPrice?: number;
   profit?: number;
+  packagingTypeId?: string | null;
+  packagingCharge?: number;
+  packagingType?: PackagingType | null;
+}
+
+export interface PackagingType {
+  id: string;
+  name: string;
+  extraCharge: number;
+  chargeType: 'FIXED' | 'PER_KG' | 'PERCENTAGE';
+  isActive: boolean;
+  categories?: Array<{ categoryId: string; category: Category }>;
 }
 
 export interface Sale {

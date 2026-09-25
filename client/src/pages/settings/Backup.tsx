@@ -59,7 +59,7 @@ interface BackupSchedule {
 }
 
 const defaultGroups: BackupGroupKey[] = ['ADMIN', 'PRODUCTION_MANAGER', 'CASHIER'];
-const defaultDestination = 'D:\\Backups\\DarbarSweets';
+const defaultDestination = 'D:\\Backups\\EasternSweets';
 
 const formatDate = (value?: string) =>
   value
@@ -275,7 +275,7 @@ export default function Backup() {
               }}
             />
             <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              Restore ke liye full database backup file use karein, jaise <span className="font-semibold">darbar-sweets-backup-....dump</span> ya .sql.
+              Restore ke liye full database backup file use karein, jaise <span className="font-semibold">eastern-sweets-backup-....dump</span> ya .sql.
               Ek file select karne se database replace hoga. Multiple files select karne se data merge hoga.
             </div>
           </div>

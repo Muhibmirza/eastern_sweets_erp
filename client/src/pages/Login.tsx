@@ -55,12 +55,10 @@ export default function Login() {
         muted
         playsInline
         preload="auto"
-        poster="/assets/darbar-sweets-login-poster.jpg"
         aria-hidden="true"
       >
-        <source src="/login-bg.mp4" type="video/mp4" />
-        <source src="/login-bg.mov" type="video/quicktime" />
-        <source src="/assets/darbar-sweets-login-bg.mp4" type="video/mp4" />
+        <source src="/eastern-bg.mp4" type="video/mp4" />
+        <source src="/eastern-bg.webm" type="video/webm" />
       </video>
       <div className="fixed inset-0 z-[1] bg-black/45" />
       <div className="pointer-events-none fixed inset-0 z-[2] bg-[linear-gradient(180deg,_rgba(0,0,0,0.08),_rgba(0,0,0,0.24))]" />
@@ -74,14 +72,14 @@ export default function Login() {
           <div className="mb-4 text-center sm:mb-7">
             <div className="login-logo-wrap mx-auto mb-3 grid h-20 w-20 place-items-center rounded-2xl bg-white p-2 shadow-[0_14px_34px_rgba(9,45,43,0.18)] sm:mb-4 sm:h-32 sm:w-32 sm:p-2.5">
               <img
-                src="/assets/darbar-sweets-logo.png"
-                alt="Darbar Sweets"
+                src="/eastern-sweets-logo.png"
+                alt="Eastern Sweets"
                 className="h-full w-full object-contain"
               />
             </div>
-            <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#c88421] sm:text-[0.72rem] sm:tracking-[0.26em]">Darbar Sweets</p>
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#c88421] sm:text-[0.72rem] sm:tracking-[0.26em]">Eastern Sweets</p>
             <h1 className="mt-1 font-serif text-2xl font-semibold leading-tight tracking-wide text-[#0f615d] sm:mt-2 sm:text-4xl">
-              Darbar Sweets
+              Eastern Sweets
             </h1>
             <p className="mx-auto mt-1 max-w-xs text-xs font-medium text-[#55716d] sm:mt-2 sm:text-sm">
               Business Management

@@ -273,7 +273,7 @@ CREATE TABLE "Salary" (
 -- CreateTable
 CREATE TABLE "ShopSettings" (
     "id" TEXT NOT NULL,
-    "shopName" TEXT NOT NULL DEFAULT 'Darbar Sweets',
+    "shopName" TEXT NOT NULL DEFAULT 'Eastern Sweets',
     "address" TEXT,
     "phone" TEXT,
     "city" TEXT,

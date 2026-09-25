@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null, accessToken: null, refreshToken: null, remember: false })
     }),
     {
-      name: 'darbar-auth',
+      name: 'eastern-auth',
       version: 3,
       migrate: () => ({ user: null, accessToken: null, refreshToken: null, remember: false }),
       partialize: () => ({})

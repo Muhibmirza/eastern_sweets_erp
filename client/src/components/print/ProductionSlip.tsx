@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { formatQuantity, pkr } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -7,9 +7,8 @@ export function ProductionSlip({ order }: { order: any }) {
   return (
     <div className="thermal-print">
       <div className="print-center">
-        <img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} />
-        <div>Liquat Chowk, Sukkur, Sindh</div>
-        <div>Ph: 0317-3258390</div>
+        <img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} />
+        <div>Eastern Sweets, Bakers &amp; Nimco</div>
         <h2>PRODUCTION ORDER</h2>
       </div>
       <div className="print-line" />

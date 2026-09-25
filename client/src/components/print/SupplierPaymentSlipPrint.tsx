@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
 const money = (value: number) => Number(value || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
@@ -17,7 +17,7 @@ export function SupplierPaymentSlipPrint({ summary, payment }: { summary: any; p
   return (
     <div className="thermal-print">
       <div className="print-center">
-        <img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" />
+        <img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" />
         <div style={{ fontSize: '12pt', fontWeight: 900 }}>SUPPLIER PAYMENT SLIP</div>
       </div>
       <div className="print-line" />

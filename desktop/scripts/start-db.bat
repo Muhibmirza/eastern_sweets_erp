@@ -1,10 +1,10 @@
 @echo off
-echo Starting Darbar Sweets Database...
+echo Starting Eastern Sweets Database...
 
-docker ps -a --filter "name=darbar-sweets-db" --format "{{.Names}}" | findstr darbar-sweets-db >nul
+docker ps -a --filter "name=eastern-sweets-db" --format "{{.Names}}" | findstr eastern-sweets-db >nul
 if %errorlevel%==0 (
     echo Database container exists. Starting it...
-    docker start darbar-sweets-db
+    docker start eastern-sweets-db
 ) else (
     echo Creating database container for the first time...
     node "%~dp0start-db.cjs"

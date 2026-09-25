@@ -1,1 +1,1 @@
-export const canEditDelete = (role?: string) => role === 'ADMIN';
+export const canEditDelete = (role?: string) => role === 'ADMIN' || role === 'MANAGER';

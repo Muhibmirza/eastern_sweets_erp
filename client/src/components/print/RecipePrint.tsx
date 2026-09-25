@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { formatQuantity, pkr } from '../../utils/format';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
@@ -11,7 +11,7 @@ export function RecipePrint({ recipe, cost }: { recipe: any; cost?: any }) {
   const totalCostPerUnit = cost?.totalCostPerUnit || cost?.costPerUnit || 0;
   return (
     <div className="thermal-print">
-      <div className="print-center"><img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>RECIPE COST SHEET</h2></div>
+      <div className="print-center"><img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ width: 64, height: 64, objectFit: 'contain' }} /><h2>RECIPE COST SHEET</h2></div>
       <div className="print-line" />
       <div>Recipe Name: {recipe?.name}</div>
       <div>Date Created: {dayjs(recipe?.createdAt).format('DD-MMM-YYYY')}</div>

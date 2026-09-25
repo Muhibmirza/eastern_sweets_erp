@@ -68,7 +68,7 @@ function runtimePath(...parts) {
 
 function legacyRuntimePath(...parts) {
   const appData = process.env.APPDATA || app.getPath('appData');
-  return path.join(appData, `Darbar Sweets ${'ER'}${'P'}`, 'runtime', ...parts);
+  return path.join(appData, `Eastern Sweets ${'ER'}${'P'}`, 'runtime', ...parts);
 }
 
 function syncDirectory(source, target) {
@@ -99,14 +99,14 @@ function prepareRuntime() {
 function appDatabasePath() {
   const dataDir = runtimePath('server', 'data');
   fs.mkdirSync(dataDir, { recursive: true });
-  const dbPath = path.join(dataDir, 'darbar-sweets.db');
+  const dbPath = path.join(dataDir, 'eastern-sweets.db');
   if (fs.existsSync(dbPath) && fs.statSync(dbPath).size === 0) fs.unlinkSync(dbPath);
   return dbPath;
 }
 
 function migrationDatabaseUrl() {
   appDatabasePath();
-  return 'file:../data/darbar-sweets.db';
+  return 'file:../data/eastern-sweets.db';
 }
 
 function serverDatabaseUrl() {
@@ -119,7 +119,7 @@ function serverSecrets() {
   const values = fs.existsSync(envPath) ? dotenv.parse(fs.readFileSync(envPath)) : {};
   for (const key of ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'SEED_ADMIN_PASSWORD', 'SEED_CASHIER_PASSWORD', 'SEED_PRODUCTION_PASSWORD']) {
     if (process.env[key]) values[key] = process.env[key];
-    if (!values[key]) values[key] = require('crypto').randomBytes(key.startsWith('JWT_') ? 48 : 24).toString('hex');
+    if (!values[key]) values[key] = key === 'SEED_ADMIN_PASSWORD' ? 'Admin@123' : require('crypto').randomBytes(key.startsWith('JWT_') ? 48 : 24).toString('hex');
   }
   values.DATABASE_URL = serverDatabaseUrl();
   values.CLIENT_URL = SERVER_URL;
@@ -145,8 +145,8 @@ function checkBackendHealth(timeoutMs = 2500) {
 async function waitForBackendAndLoad() {
   try {
     await waitOn({ resources: [`${SERVER_URL}/api/health`], timeout: 45000 });
-    writeLog('Darbar Sweets server is ready');
-    showStartupStatus('Opening Darbar Sweets...');
+    writeLog('Eastern Sweets server is ready');
+    showStartupStatus('Opening Eastern Sweets...');
     if (mainWindow && !mainWindow.isDestroyed()) await mainWindow.loadURL(SERVER_URL);
     consecutiveHealthFailures = 0;
   } catch (error) {
@@ -159,7 +159,7 @@ async function waitForBackendAndLoad() {
 function scheduleBackendRestart(reason) {
   if (isQuitting || backendStarting) return;
   writeLog(`Scheduling backend restart: ${reason}`);
-  showStartupStatus('Darbar Sweets server reconnecting...');
+  showStartupStatus('Eastern Sweets server reconnecting...');
   setTimeout(async () => {
     if (isQuitting || backendStarting) return;
     if (serverProcess && !serverProcess.killed) {
@@ -288,7 +288,7 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     icon: path.join(__dirname, 'assets', 'icon.png'),
-    title: 'Darbar Sweets',
+    title: 'Eastern Sweets',
     autoHideMenuBar: true,
     frame: true,
     titleBarStyle: 'default',
@@ -319,7 +319,7 @@ function createTray() {
   tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
   const networkInfo = getNetworkInfo();
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Open Darbar Sweets', click: () => mainWindow?.show() },
+    { label: 'Open Eastern Sweets', click: () => mainWindow?.show() },
     { label: `Network Address: ${networkInfo.localUrl}`, enabled: false },
     {
       label: 'Quit',
@@ -329,7 +329,7 @@ function createTray() {
       }
     }
   ]);
-  tray.setToolTip('Darbar Sweets');
+  tray.setToolTip('Eastern Sweets');
   tray.setContextMenu(contextMenu);
 }
 
@@ -345,7 +345,7 @@ function showUpdateProgressWindow() {
     modal: Boolean(mainWindow),
     resizable: false,
     autoHideMenuBar: true,
-    title: 'Updating Darbar Sweets',
+    title: 'Updating Eastern Sweets',
     icon: path.join(__dirname, 'assets', 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
@@ -379,7 +379,7 @@ function setupAutoUpdater() {
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       title: 'Update Available',
-      message: `A new version (${info.version}) of Darbar Sweets is available.`,
+      message: `A new version (${info.version}) of Eastern Sweets is available.`,
       detail: 'Your shop database and data will not be affected. Download and install now?',
       buttons: ['Download & Install', 'Later'],
       defaultId: 0,
@@ -474,7 +474,7 @@ ipcMain.handle('silent-print-html', async (_event, htmlContent) => {
       contextIsolation: true
     }
   });
-  const tempPrintFile = path.join(app.getPath('temp'), `darbar-sweets-print-${Date.now()}.html`);
+  const tempPrintFile = path.join(app.getPath('temp'), `eastern-sweets-print-${Date.now()}.html`);
   const printHtml = `
     <!DOCTYPE html>
     <html>
@@ -542,14 +542,14 @@ ipcMain.handle('silent-print-html', async (_event, htmlContent) => {
 
 app.whenReady().then(async () => {
   logFile = path.join(app.getPath('userData'), 'startup.log');
-  writeLog('Darbar Sweets starting');
+  writeLog('Eastern Sweets starting');
   createWindow();
   createTray();
   setupAutoUpdater();
 
   showStartupStatus('Preparing local database...');
   await runMigrations();
-  showStartupStatus('Starting Darbar Sweets server...');
+  showStartupStatus('Starting Eastern Sweets server...');
   startBackendServer();
   await waitForBackendAndLoad();
   startHealthMonitor();

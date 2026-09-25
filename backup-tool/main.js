@@ -5,9 +5,9 @@ const { execFile, spawn } = require('child_process');
 const { promisify } = require('util');
 const execFileAsync = promisify(execFile);
 
-const DOCKER_CONTAINER = 'darbar-sweets-db';
+const DOCKER_CONTAINER = 'eastern-sweets-db';
 const POSTGRES_USER = 'postgres';
-const POSTGRES_DB = 'darbar_sweets_erp';
+const POSTGRES_DB = 'eastern_sweets_erp';
 
 const BACKUP_GROUPS = {
   ADMIN: {
@@ -108,7 +108,7 @@ function createWindow() {
     minWidth: 780,
     minHeight: 680,
     icon: path.join(__dirname, 'assets', 'icon.png'),
-    title: 'Darbar Sweets - Backup Tool',
+    title: 'Eastern Sweets - Backup Tool',
     autoHideMenuBar: true,
     frame: true,
     titleBarStyle: 'default',
@@ -130,7 +130,7 @@ function createWindow() {
 
 function createTray() {
   tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
-  tray.setToolTip('Darbar Sweets Backup Tool');
+  tray.setToolTip('Eastern Sweets Backup Tool');
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: 'Open Backup Tool', click: () => mainWindow?.show() },
     { label: 'Run Backup Now', click: () => runBackup({ ...readConfig().schedule, destination: readConfig().destination, type: 'AUTO' }).catch(console.error) },
@@ -148,7 +148,7 @@ function databasePath() {
     if (fs.existsSync(appDataDb)) return appDataDb;
   }
   for (const root of candidateErpRoots()) {
-    const db = path.join(root, 'resources', 'server', 'data', 'darbar-sweets.db');
+    const db = path.join(root, 'resources', 'server', 'data', 'eastern-sweets.db');
     if (fs.existsSync(path.join(root, 'resources', 'server'))) return db;
   }
   return erpAppDataDatabasePaths()[0];
@@ -157,35 +157,35 @@ function databasePath() {
 function erpAppDataDatabasePaths() {
   const appData = process.env.APPDATA || app.getPath('appData');
   return [
-    path.join(appData, 'Darbar Sweets', 'runtime', 'server', 'data', 'darbar-sweets.db'),
-    path.join(appData, `Darbar Sweets ${'ER'}${'P'}`, 'runtime', 'server', 'data', 'darbar-sweets.db'),
-    path.join(appData, 'darbar-sweets', 'runtime', 'server', 'data', 'darbar-sweets.db'),
-    path.join(appData, 'darbar-sweets-erp', 'runtime', 'server', 'data', 'darbar-sweets.db'),
-    path.join(app.getPath('appData'), 'Darbar Sweets', 'runtime', 'server', 'data', 'darbar-sweets.db'),
-    path.join(app.getPath('appData'), `Darbar Sweets ${'ER'}${'P'}`, 'runtime', 'server', 'data', 'darbar-sweets.db')
+    path.join(appData, 'Eastern Sweets', 'runtime', 'server', 'data', 'eastern-sweets.db'),
+    path.join(appData, `Eastern Sweets ${'ER'}${'P'}`, 'runtime', 'server', 'data', 'eastern-sweets.db'),
+    path.join(appData, 'eastern-sweets', 'runtime', 'server', 'data', 'eastern-sweets.db'),
+    path.join(appData, 'eastern-sweets-erp', 'runtime', 'server', 'data', 'eastern-sweets.db'),
+    path.join(app.getPath('appData'), 'Eastern Sweets', 'runtime', 'server', 'data', 'eastern-sweets.db'),
+    path.join(app.getPath('appData'), `Eastern Sweets ${'ER'}${'P'}`, 'runtime', 'server', 'data', 'eastern-sweets.db')
   ];
 }
 
 function erpExePath() {
   for (const root of candidateErpRoots()) {
-    const newExe = path.join(root, 'Darbar Sweets.exe');
-    const legacyExe = path.join(root, `Darbar Sweets ${'ER'}${'P'}.exe`);
+    const newExe = path.join(root, 'Eastern Sweets.exe');
+    const legacyExe = path.join(root, `Eastern Sweets ${'ER'}${'P'}.exe`);
     if (fs.existsSync(newExe)) return newExe;
     if (fs.existsSync(legacyExe)) return legacyExe;
   }
-  return path.join(appRootDir(), 'Darbar Sweets.exe');
+  return path.join(appRootDir(), 'Eastern Sweets.exe');
 }
 
 function candidateErpRoots() {
   return Array.from(new Set([
     appRootDir(),
     path.resolve(__dirname, '..', 'desktop', 'release', 'win-unpacked'),
-    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Darbar Sweets'),
-    path.join(process.env.LOCALAPPDATA || '', 'Programs', `Darbar Sweets ${'ER'}${'P'}`),
-    path.join(process.env.PROGRAMFILES || '', 'Darbar Sweets'),
-    path.join(process.env.PROGRAMFILES || '', `Darbar Sweets ${'ER'}${'P'}`),
-    path.join(process.env['PROGRAMFILES(X86)'] || '', 'Darbar Sweets'),
-    path.join(process.env['PROGRAMFILES(X86)'] || '', `Darbar Sweets ${'ER'}${'P'}`)
+    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Eastern Sweets'),
+    path.join(process.env.LOCALAPPDATA || '', 'Programs', `Eastern Sweets ${'ER'}${'P'}`),
+    path.join(process.env.PROGRAMFILES || '', 'Eastern Sweets'),
+    path.join(process.env.PROGRAMFILES || '', `Eastern Sweets ${'ER'}${'P'}`),
+    path.join(process.env['PROGRAMFILES(X86)'] || '', 'Eastern Sweets'),
+    path.join(process.env['PROGRAMFILES(X86)'] || '', `Eastern Sweets ${'ER'}${'P'}`)
   ].filter(Boolean)));
 }
 
@@ -205,7 +205,7 @@ async function ensureDatabase() {
       }
     }
   }
-  throw new Error('Database was not found. Open Darbar Sweets once, login, then run backup again.');
+  throw new Error('Database was not found. Open Eastern Sweets once, login, then run backup again.');
 }
 
 async function isDockerPostgresAvailable() {
@@ -375,19 +375,19 @@ async function runBackup({ groups, destination, type = 'MANUAL' }) {
   let filename;
   let filePath;
   if (await isDockerPostgresAvailable()) {
-    filename = `darbar-sweets-full-backup-${timestamp()}.dump`;
+    filename = `eastern-sweets-full-backup-${timestamp()}.dump`;
     filePath = path.join(backupDir, filename);
     await runPgDump(filePath);
   } else if (fullBackup) {
     const db = databasePath();
-    if (!fs.existsSync(db)) throw new Error('Darbar Sweets database was not found. Open Darbar Sweets once before taking backup.');
-    filename = `darbar-sweets-full-backup-${timestamp()}.db`;
+    if (!fs.existsSync(db)) throw new Error('Eastern Sweets database was not found. Open Eastern Sweets once before taking backup.');
+    filename = `eastern-sweets-full-backup-${timestamp()}.db`;
     filePath = path.join(backupDir, filename);
     fs.copyFileSync(db, filePath);
   } else {
     const exportData = {};
     for (const group of selected) exportData[group] = await exportGroup(group);
-    filename = `darbar-sweets-partial-backup-${timestamp()}.json`;
+    filename = `eastern-sweets-partial-backup-${timestamp()}.json`;
     filePath = path.join(backupDir, filename);
     fs.writeFileSync(filePath, JSON.stringify({ createdAt: new Date().toISOString(), groups: selected, data: exportData }, null, 2), 'utf8');
   }

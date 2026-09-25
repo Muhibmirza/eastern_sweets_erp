@@ -17,18 +17,21 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sales            Sale[]
-  stockMovements   StockMovement[]
-  expenses         Expense[]
-  attendance       Attendance[]
-  salaries         Salary[]
-  productionOrders ProductionOrder[]
-  journalEntries   JournalEntry[]
-  employeeAdvances EmployeeAdvance[] @relation("AdvanceCreator")
-  approvedLeaves   LeaveRequest[]    @relation("LeaveApprover")
-  auditLogs        AuditLog[]
-  tokens           Token[]
-  supplierAdvances SupplierAdvance[] @relation("SupplierAdvanceCreator")
+  sales                 Sale[]
+  stockMovements        StockMovement[]
+  expenses              Expense[]
+  attendance            Attendance[]
+  salaries              Salary[]
+  productionOrders      ProductionOrder[]
+  journalEntries        JournalEntry[]
+  employeeAdvances      EmployeeAdvance[]      @relation("AdvanceCreator")
+  approvedLeaves        LeaveRequest[]         @relation("LeaveApprover")
+  auditLogs             AuditLog[]
+  tokens                Token[]
+  supplierAdvances      SupplierAdvance[]      @relation("SupplierAdvanceCreator")
+  kitchenTransfers      KitchenTransfer[]
+  kitchenProductionRuns KitchenProductionRun[]
+  kitchenAdjustments    KitchenAdjustment[]
 }
 
 model Category {
@@ -39,34 +42,38 @@ model Category {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
-  products Product[]
+  products            Product[]
+  packagingCategories PackagingTypeCategory[]
 }
 
 model Product {
-  id            String   @id @default(cuid())
-  name          String
-  categoryId    String
-  unit          String   @default("PIECE")
-  sellingPrice  Float
-  costPrice     Float
-  currentCost   Float    @default(0)
-  currentStock  Float    @default(0)
-  minStockLevel Float    @default(5)
-  imageUrl      String?
-  isActive      Boolean  @default(true)
-  skuCode       String?  @unique
-  barcode       String?
-  description   String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  categoryId      String
+  unit            String   @default("PIECE")
+  sellingPrice    Float
+  costPrice       Float
+  currentCost     Float    @default(0)
+  currentStock    Float    @default(0)
+  minStockLevel   Float    @default(5)
+  imageUrl        String?
+  isActive        Boolean  @default(true)
+  skuCode         String?  @unique
+  barcode         String?
+  description     String?
+  saleMode        String   @default("UNIT")
+  quantityPresets String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  category         Category          @relation(fields: [categoryId], references: [id])
-  stockMovements   StockMovement[]
-  orderItems       OrderItem[]
-  saleItems        SaleItem[]
-  saleReturnItems  SaleReturnItem[]
-  recipes          Recipe[]
-  productionOrders ProductionOrder[]
+  category              Category               @relation(fields: [categoryId], references: [id])
+  stockMovements        StockMovement[]
+  orderItems            OrderItem[]
+  saleItems             SaleItem[]
+  saleReturnItems       SaleReturnItem[]
+  recipes               Recipe[]
+  productionOrders      ProductionOrder[]
+  kitchenProductionRuns KitchenProductionRun[]
 }
 
 model RawMaterial {
@@ -88,6 +95,9 @@ model RawMaterial {
   purchaseReturnItems    PurchaseReturnItem[]
   recipeIngredients      RecipeIngredient[]
   productionConsumptions ProductionConsumption[]
+  kitchenTransfers       KitchenTransfer[]
+  kitchenConsumptions    KitchenConsumption[]
+  kitchenAdjustments     KitchenAdjustment[]
 }
 
 model Supplier {
@@ -101,25 +111,25 @@ model Supplier {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  rawMaterials   RawMaterial[]
-  purchaseOrders PurchaseOrder[]
-  payments       SupplierPayment[]
+  rawMaterials    RawMaterial[]
+  purchaseOrders  PurchaseOrder[]
+  payments        SupplierPayment[]
   purchaseReturns PurchaseReturn[]
-  advances      SupplierAdvance[]
+  advances        SupplierAdvance[]
 }
 
 model SupplierAdvance {
-  id               String              @id @default(cuid())
+  id               String   @id @default(cuid())
   supplierId       String
-  advanceType      String              @default("SHORT_TERM")
+  advanceType      String   @default("SHORT_TERM")
   totalAmount      Float
   remainingBalance Float
   monthlyDeduction Float?
   reason           String?
-  advanceDate      DateTime            @default(now())
-  isFullyRecovered Boolean             @default(false)
+  advanceDate      DateTime @default(now())
+  isFullyRecovered Boolean  @default(false)
   createdBy        String
-  createdAt        DateTime            @default(now())
+  createdAt        DateTime @default(now())
 
   supplier      Supplier                  @relation(fields: [supplierId], references: [id])
   createdByUser User                      @relation("SupplierAdvanceCreator", fields: [createdBy], references: [id])
@@ -137,16 +147,16 @@ model SupplierAdvanceRecovery {
 }
 
 model SupplierPayment {
-  id            String   @id @default(cuid())
-  supplierId    String
+  id              String   @id @default(cuid())
+  supplierId      String
   purchaseOrderId String?
-  amount        Float
-  paymentMethod String   @default("CASH")
-  notes         String?
-  createdBy     String?
-  createdAt     DateTime @default(now())
+  amount          Float
+  paymentMethod   String   @default("CASH")
+  notes           String?
+  createdBy       String?
+  createdAt       DateTime @default(now())
 
-  supplier Supplier @relation(fields: [supplierId], references: [id])
+  supplier      Supplier       @relation(fields: [supplierId], references: [id])
   purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
 }
 
@@ -160,7 +170,7 @@ model PurchaseOrder {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  supplier Supplier       @relation(fields: [supplierId], references: [id])
+  supplier Supplier          @relation(fields: [supplierId], references: [id])
   items    PurchaseItem[]
   payments SupplierPayment[]
   returns  PurchaseReturn[]
@@ -271,25 +281,25 @@ model OrderItem {
 }
 
 model Sale {
-  id            String   @id @default(cuid())
-  invoiceNo     String   @unique
-  customerId    String?
-  totalAmount   Float
-  discount      Float    @default(0)
-  taxAmount     Float    @default(0)
-  netAmount     Float
-  paymentMethod String   @default("CASH")
-  cashReceived  Float?
-  changeGiven   Float?
-  isDelivery    Boolean  @default(false)
-  deliveryCharges Float  @default(0)
-  tokenId       String?
-  tokenNumber   Int?
-  cashierId     String
-  createdAt     DateTime @default(now())
+  id              String   @id @default(cuid())
+  invoiceNo       String   @unique
+  customerId      String?
+  totalAmount     Float
+  discount        Float    @default(0)
+  taxAmount       Float    @default(0)
+  netAmount       Float
+  paymentMethod   String   @default("CASH")
+  cashReceived    Float?
+  changeGiven     Float?
+  isDelivery      Boolean  @default(false)
+  deliveryCharges Float    @default(0)
+  tokenId         String?
+  tokenNumber     Int?
+  cashierId       String
+  createdAt       DateTime @default(now())
 
-  customer Customer?  @relation(fields: [customerId], references: [id])
-  cashier  User       @relation(fields: [cashierId], references: [id])
+  customer Customer?    @relation(fields: [customerId], references: [id])
+  cashier  User         @relation(fields: [cashierId], references: [id])
   items    SaleItem[]
   returns  SaleReturn[]
 }
@@ -305,10 +315,37 @@ model SaleItem {
   subtotal        Float
   costPrice       Float   @default(0)
   profit          Float   @default(0)
+  packagingTypeId String?
+  packagingCharge Float   @default(0)
 
-  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-  returns SaleReturnItem[]
+  sale          Sale             @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product       Product          @relation(fields: [productId], references: [id])
+  returns       SaleReturnItem[]
+  packagingType PackagingType?   @relation(fields: [packagingTypeId], references: [id])
+}
+
+model PackagingType {
+  id          String   @id @default(cuid())
+  name        String
+  extraCharge Float    @default(0)
+  chargeType  String   @default("FIXED")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categories PackagingTypeCategory[]
+  saleItems  SaleItem[]
+}
+
+model PackagingTypeCategory {
+  id              String @id @default(cuid())
+  packagingTypeId String
+  categoryId      String
+
+  packagingType PackagingType @relation(fields: [packagingTypeId], references: [id], onDelete: Cascade)
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([packagingTypeId, categoryId])
 }
 
 model SaleReturn {
@@ -339,13 +376,13 @@ model SaleReturnItem {
 }
 
 model Token {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   tokenNumber Int
   items       String
   totalAmount Float
-  status      String   @default("PENDING")
+  status      String    @default("PENDING")
   cashierId   String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
   saleId      String?
 
@@ -353,8 +390,8 @@ model Token {
 }
 
 model TokenCounter {
-  id         String @id @default("default")
-  nextNumber Int   @default(1)
+  id         String   @id @default("default")
+  nextNumber Int      @default(1)
   updatedAt  DateTime @updatedAt
 }
 
@@ -529,6 +566,60 @@ model ProductionConsumption {
   rawMaterial     RawMaterial     @relation(fields: [rawMaterialId], references: [id])
 }
 
+model KitchenTransfer {
+  id            String   @id @default(cuid())
+  rawMaterialId String
+  quantity      Float
+  unit          String
+  transferredBy String
+  receivedBy    String?
+  notes         String?
+  transferDate  DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  rawMaterial       RawMaterial @relation(fields: [rawMaterialId], references: [id])
+  transferredByUser User        @relation(fields: [transferredBy], references: [id])
+}
+
+model KitchenProductionRun {
+  id               String   @id @default(cuid())
+  productId        String
+  quantityProduced Float
+  unit             String
+  producedBy       String
+  productionDate   DateTime @default(now())
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  product        Product              @relation(fields: [productId], references: [id])
+  producedByUser User                 @relation(fields: [producedBy], references: [id])
+  consumptions   KitchenConsumption[]
+}
+
+model KitchenConsumption {
+  id                     String @id @default(cuid())
+  kitchenProductionRunId String
+  rawMaterialId          String
+  quantityDeducted       Float
+  unit                   String
+
+  productionRun KitchenProductionRun @relation(fields: [kitchenProductionRunId], references: [id], onDelete: Cascade)
+  rawMaterial   RawMaterial          @relation(fields: [rawMaterialId], references: [id])
+}
+
+model KitchenAdjustment {
+  id            String   @id @default(cuid())
+  rawMaterialId String
+  quantity      Float
+  adjustType    String
+  reason        String
+  adjustedBy    String
+  adjustedAt    DateTime @default(now())
+
+  rawMaterial    RawMaterial @relation(fields: [rawMaterialId], references: [id])
+  adjustedByUser User        @relation(fields: [adjustedBy], references: [id])
+}
+
 model ChartOfAccounts {
   id        String   @id @default(cuid())
   code      String   @unique
@@ -675,7 +766,7 @@ model AuditLog {
 
 model ShopSettings {
   id        String   @id @default(cuid())
-  shopName  String   @default("Darbar Sweets")
+  shopName  String   @default("Eastern Sweets")
   address   String?
   phone     String?
   city      String?

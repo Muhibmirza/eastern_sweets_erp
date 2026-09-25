@@ -23,9 +23,9 @@ router.get('/', getProducts);
 router.get('/low-stock', getLowStockProducts);
 router.get('/barcode/:barcode', getProductByBarcode);
 router.get('/:id', getProduct);
-router.post('/', authorize('ADMIN', 'PRODUCTION_MANAGER'), upload.single('image'), validateWriteNumbers, createProduct);
+router.post('/', authorize('ADMIN', 'MANAGER', 'PRODUCTION_MANAGER'), upload.single('image'), validateWriteNumbers, createProduct);
 router.post('/:id/add-stock', authorize('ADMIN', 'PRODUCTION_MANAGER'), addProductStock);
-router.put('/:id', authorize('ADMIN'), upload.single('image'), validateWriteNumbers, updateProduct);
-router.delete('/:id', authorize('ADMIN'), deleteProduct);
+router.put('/:id', authorize('ADMIN', 'MANAGER'), upload.single('image'), validateWriteNumbers, updateProduct);
+router.delete('/:id', authorize('ADMIN', 'MANAGER'), deleteProduct);
 
 export default router;

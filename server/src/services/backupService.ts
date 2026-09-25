@@ -7,9 +7,9 @@ import prisma from '../utils/prisma';
 import { ALL_BACKUP_GROUPS, BACKUP_GROUPS, BackupGroupKey } from '../config/backupGroups';
 
 const execFileAsync = promisify(execFile);
-const DOCKER_CONTAINER = process.env.POSTGRES_CONTAINER || 'darbar-sweets-db';
+const DOCKER_CONTAINER = process.env.POSTGRES_CONTAINER || 'eastern-sweets-db';
 const POSTGRES_USER = process.env.POSTGRES_USER || 'postgres';
-const POSTGRES_DB = process.env.POSTGRES_DB || 'darbar_sweets_erp';
+const POSTGRES_DB = process.env.POSTGRES_DB || 'eastern_sweets_erp';
 
 const delegateByTable: Record<string, string> = {
   User: 'user',
@@ -72,7 +72,7 @@ export function parseGroups(value: string | string[] | null | undefined): Backup
 }
 
 export function databaseFilePath() {
-  const url = process.env.DATABASE_URL || 'file:./darbar-sweets.db';
+  const url = process.env.DATABASE_URL || 'file:./eastern-sweets.db';
   const raw = decodeURI(url.replace(/^file:/, ''));
   if (path.isAbsolute(raw)) return raw;
   const schemaRelative = path.resolve(process.cwd(), 'prisma', raw);
@@ -89,7 +89,7 @@ function assertSQLiteDatabase(filePath: string) {
     fs.closeSync(fd);
   }
   if (header.toString('utf8') !== 'SQLite format 3\0') {
-    throw new Error('Invalid backup file. Please select a full Darbar Sweets .db backup file.');
+    throw new Error('Invalid backup file. Please select a full Eastern Sweets .db backup file.');
   }
 }
 
@@ -198,7 +198,7 @@ async function buildGroupExport(group: BackupGroupKey) {
 
 async function buildSelectedExport(groups: BackupGroupKey[]) {
   const payload: Record<string, unknown> = {
-    app: 'Darbar Sweets',
+    app: 'Eastern Sweets',
     createdAt: new Date().toISOString(),
     groups: {}
   };
@@ -259,17 +259,17 @@ export async function runBackup({
   const backupDir = destination?.trim() || path.resolve(process.cwd(), 'backups');
   fs.mkdirSync(backupDir, { recursive: true });
 
-  let filename = `darbar-sweets-backup-${timestamp()}.json`;
+  let filename = `eastern-sweets-backup-${timestamp()}.json`;
   let filePath = path.join(backupDir, filename);
 
   if (isFullBackup) {
-    filename = `darbar-sweets-backup-${timestamp()}.dump`;
+    filename = `eastern-sweets-backup-${timestamp()}.dump`;
     filePath = path.join(backupDir, filename);
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     if (await isDockerPostgresAvailable()) {
       await runPgDump(filePath);
     } else {
-      filename = `darbar-sweets-backup-${timestamp()}.db`;
+      filename = `eastern-sweets-backup-${timestamp()}.db`;
       filePath = path.join(backupDir, filename);
       const dbPath = databaseFilePath();
       if (!fs.existsSync(dbPath)) throw new Error('Database file was not found for backup.');

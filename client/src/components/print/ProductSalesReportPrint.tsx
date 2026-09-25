@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DARBAR_SWEETS_LOGO_BASE64 } from '../../constants/logo';
+import { EASTERN_SWEETS_LOGO_BASE64 } from '../../constants/logo';
 import { PrintBrandFooter } from './PrintBrandFooter';
 
 const money = (value: number) => Number(value || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
@@ -23,7 +23,7 @@ export function ProductSalesReportPrint({ report }: { report: any }) {
       color: '#000'
     }}>
       <div style={{ textAlign: 'center', marginBottom: '4px' }}>
-        <img src={DARBAR_SWEETS_LOGO_BASE64} alt="Darbar Sweets" style={{ width: '55px', height: '55px', objectFit: 'contain' }} />
+        <img src={EASTERN_SWEETS_LOGO_BASE64} alt="Eastern Sweets" style={{ width: '55px', height: '55px', objectFit: 'contain' }} />
       </div>
       <div style={{ textAlign: 'center', fontSize: '13pt', fontWeight: 900, marginBottom: '3px', letterSpacing: '0.5px' }}>PRODUCT SALES REPORT</div>
       <div style={{ textAlign: 'center', fontSize: '11pt', marginBottom: '2px' }}>{product.name || '-'}</div>
