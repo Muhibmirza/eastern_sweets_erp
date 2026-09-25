@@ -90,7 +90,7 @@ export async function ensureDefaultData() {
     data: { name: 'Admin', email: 'admin@easternsweets.com', password: adminPassword, role: 'ADMIN', isActive: true }
   });
   await prisma.user.create({
-    data: { name: 'Ahmed Cashier', email: 'cashier@easternsweets.com', password: cashierPassword, role: 'CASHIER', isActive: true }
+    data: { name: 'Cashier', email: 'cashier@easternsweets.com', password: cashierPassword, role: 'CASHIER', isActive: true }
   });
   await prisma.user.create({
     data: { name: 'Production Manager', email: 'production@easternsweets.com', password: productionPassword, role: 'PRODUCTION_MANAGER', isActive: true }

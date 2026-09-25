@@ -27,7 +27,7 @@ async function main() {
     where: { email: 'cashier@easternsweets.com' },
     update: { role: CASHIER_ROLE, isActive: true },
     create: {
-      name: 'Ahmed Cashier',
+      name: 'Cashier',
       email: 'cashier@easternsweets.com',
       password: await bcrypt.hash(bootstrapPassword('SEED_CASHIER_PASSWORD'), 12),
       role: CASHIER_ROLE
